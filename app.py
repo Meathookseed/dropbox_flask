@@ -186,7 +186,7 @@ def login():
     return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
 
 
-@app.route('/vault/create/<public_id>', methods=['POST'])
+@app.route('/user/<public_id>/vault/create', methods=['POST'])
 @token_required
 def vault_create(current_user, public_id):
 
@@ -223,7 +223,7 @@ def vault_list(current_user):
     return jsonify({'vaults': output})
 
 
-@app.route('/user_<public_id>/vault_<vault_id>/update/', methods=['PUT'])
+@app.route('/user/<public_id>/vault/<vault_id>', methods=['PUT'])
 @token_required
 def vault_update(current_user, public_id, vault_id):
 
@@ -245,7 +245,7 @@ def vault_update(current_user, public_id, vault_id):
     return jsonify({'message': 'vault was updated'})
 
 
-@app.route('/vault/<vault_id>/update/<public_id>', methods=['DELETE'])
+@app.route('/user/<public_id>/<vault_id>', methods=['DELETE'])
 @token_required
 def delete_vault(current_user, public_id, vault_id):
 
@@ -263,7 +263,7 @@ def delete_vault(current_user, public_id, vault_id):
     return jsonify({"message": "vault was deleted"})
 
 
-@app.route('/user_<public_id>/file/create', methods=['POST'])
+@app.route('/user/<public_id>/file/create', methods=['POST'])
 @token_required
 def file_create(current_user, public_id):
 
@@ -284,7 +284,7 @@ def file_create(current_user, public_id):
     return jsonify({'message': 'File Created!'})
 
 
-@app.route('/user_<public_id>/vault<vault_id>/file', methods=['POST'])
+@app.route('/user/<public_id>/vault/<vault_id>/file', methods=['POST'])
 @token_required
 def file_list(current_user, public_id, vault_id):
 
@@ -308,7 +308,7 @@ def file_list(current_user, public_id, vault_id):
     return jsonify({'Files': output})
 
 
-@app.route('/user_<public_id>/file_<file_id>/update')
+@app.route('/user/<public_id>/file/<file_id>/update')
 @token_required
 def file_update(current_user, public_id, file_id):
 
@@ -328,6 +328,24 @@ def file_update(current_user, public_id, file_id):
     db.session.commit()
 
     return jsonify({"message": "file updated"})
+
+
+@app.route('/user/<public_id>/file/<file_id>', methods=['DELETE'])
+@token_required
+def delete_file(current_user, public_id, file_id):
+
+    if not current_user.public_id == public_id:
+        return jsonify({'message': 'permission denied'})
+
+    file = File.query.filter_by(file_id=file_id).first()
+
+    if not file:
+        return jsonify({'message': 'there is no file like this'})
+
+    db.session.delete(file)
+    db.session.commit()
+
+    return jsonify({"message": "file was deleted"})
 
 
 if __name__ == '__main__':
