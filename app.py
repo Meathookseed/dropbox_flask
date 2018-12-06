@@ -68,6 +68,27 @@ def token_required(f):
     return decorated
 
 
+@app.route('/login')
+def login():
+
+    auth = request.authorization
+
+    if not auth or not auth.username or not auth.password:
+        return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
+
+    user = User.query.filter_by(username=auth.username).first()
+
+    if not user:
+        return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
+
+    if check_password_hash(user.password, auth.password):
+        token = jwt.encode({'public_id': user.public_id},
+                           app.config['secret_key'])
+        return jsonify({'token': token.decode("UTF-8")})
+
+    return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
+
+
 @app.route("/user", methods=['GET'])
 @token_required
 def user_list(current_user):
@@ -91,31 +112,8 @@ def user_list(current_user):
     return jsonify({'users': output})
 
 
-@app.route("/user/<public_id>", methods=['GET'])
-@token_required
-def get_one_user(current_user, public_id):
-
-    if not current_user.admin and not current_user.public_id == public_id:
-        return jsonify({'message': 'You have no permission'})
-
-    user = User.query.filter_by(public_id=public_id).first()
-
-    if not User:
-        return jsonify({'message': 'There is no user'})
-
-    user_data = dict()
-    user_data['public_id'] = user.public_id
-    user_data['username'] = user.username
-    user_data['email'] = user.email
-    user_data['admin'] = user.admin
-    user_data['password'] = user.password
-    user_data['id'] = user.id
-
-    return jsonify({'user': user_data})
-
-
 @app.route('/user', methods=['POST'])
-def create_user():
+def user_create():
 
     data = request.get_json()
 
@@ -126,64 +124,71 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({'message': "New user created"})
+    token = jwt.encode({'public_id': new_user.public_id},
+                       app.config['secret_key'])
+    return jsonify({'token': token.decode("UTF-8")})
 
 
+@app.route('/user/<public_id>', methods=['GET', 'PUT', 'DELETE'])
 @token_required
-@app.route('/user/<public_id>', methods=['PUT'])
-def update_user(current_user, public_id):
+def user_rud(current_user, public_id):
 
     if not current_user.admin and not current_user.public_id == public_id:
         return jsonify({'message': 'You have no permission'})
 
-    user = User.query.filter_by(public_id=public_id).first()
+    if request.method == 'GET':
 
-    if not user:
-        return jsonify({'message': 'There is no user'})
+        if not current_user.admin and not current_user.public_id == public_id:
+            return jsonify({'message': 'You have no permission'})
 
-    user.admin = True
-    db.session.commit()
+        user = User.query.filter_by(public_id=public_id).first()
 
-    return jsonify({'message': 'The user has been updated'})
+        if not User:
+            return jsonify({'message': 'There is no user'})
 
+        user_data = dict()
+        user_data['public_id'] = user.public_id
+        user_data['username'] = user.username
+        user_data['email'] = user.email
+        user_data['admin'] = user.admin
+        user_data['password'] = user.password
+        user_data['id'] = user.id
 
-@token_required
-@app.route('/user/<public_id>', methods=['DELETE'])
-def delete_user(current_user, public_id):
+        return jsonify({'user': user_data})
 
-    if not current_user.admin and not current_user.public_id == public_id:
-        return jsonify({'message': 'You have no permission'})
+    if request.method == 'PUT':
 
-    user = User.query.filter_by(public_id=public_id).first()
+        data = request.get_json()
 
-    if not user:
-        return jsonify({'message': 'There is no user'})
+        user = User.query.filter_by(public_id=public_id).first()
 
-    db.session.delete(user)
-    db.session.commit()
+        if not user:
+            return jsonify({'message': 'There is no user'})
 
-    return jsonify({'message': 'The user has been deleted'})
+        if 'email' in data:
+            user.email = data['email']
 
+        if 'password' in data:
+            user.password = data['password']
 
-@app.route('/login')
-def login():
+        if 'username' in data:
+            user.username = data['username']
 
-    auth = request.authorization
+        db.session.commit()
 
-    if not auth or not auth.username or not auth.password:
-        return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
+        return jsonify({'message': 'The user has been updated'})
 
-    user = User.query.filter_by(username=auth.username).first()
+    if request.method == 'DELETE':
 
-    if not user:
-        return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
+        user = User.query.filter_by(public_id=public_id).first()
 
-    if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'public_id': user.public_id},
-                           app.config['secret_key'])
-        return jsonify({'token': token.decode("UTF-8")})
+        if not user:
+            return jsonify({'message': 'There is no user'})
 
-    return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
+        db.session.delete(user)
+        db.session.commit()
+
+        return jsonify({'message': 'The user has been deleted'})
 
 
 @app.route('/user/<public_id>/vault/create', methods=['POST'])
@@ -223,44 +228,64 @@ def vault_list(current_user):
     return jsonify({'vaults': output})
 
 
-@app.route('/user/<public_id>/vault/<vault_id>', methods=['PUT'])
+@app.route('/user/<public_id>/vault/<vault_id>', methods=['GET', 'PUT', 'DELETE'])
 @token_required
-def vault_update(current_user, public_id, vault_id):
+def vault_ud(current_user, public_id, vault_id):
 
     if not current_user.public_id == public_id:
         return jsonify({'message': 'permission denied'})
 
-    data = request.get_json()
+    if request.method == 'GET':
 
-    vault = Vault.query.filter_by(vault_id=vault_id).first()
+        vault = Vault.query.filter_by(vault_id=vault_id).first()
 
-    if not vault:
-        return jsonify({'message': 'There is no vault'})
+        if not vault:
+            return jsonify({'message':'No vault like this'})g
 
-    vault.title = data['title']
-    vault.description = data['description']
-    vault.owner_id = current_user.id
-    db.session.commit()
+        output = []
+        vault_data = dict()
+        vault_data['title'] = vault.title
+        vault_data['description'] = vault.description
+        vault_data['vault_id'] = vault.vault_id
+        vault_data['owner_id'] = vault.owner_id
+        output.append(vault_data)
 
-    return jsonify({'message': 'vault was updated'})
+        return jsonify({'vault': output})
 
+    if request.method == 'PUT':
 
-@app.route('/user/<public_id>/<vault_id>', methods=['DELETE'])
-@token_required
-def delete_vault(current_user, public_id, vault_id):
+        data = request.get_json()
 
-    if not current_user.public_id == public_id:
-        return jsonify({'message': 'permission denied'})
+        vault = Vault.query.filter_by(vault_id=vault_id).first()
 
-    vault = Vault.query.filter_by(vault_id=vault_id).first()
+        if not vault:
+            return jsonify({'message': 'There is no vault'})
 
-    if not vault:
-        return jsonify({'message': 'there is no vault like this'})
+        if 'title' in data:
+            vault.title = data['title']
 
-    db.session.delete(vault)
-    db.session.commit()
+        if 'description' in data:
+            vault.description = data['description']
 
-    return jsonify({"message": "vault was deleted"})
+        vault.owner_id = current_user.id
+        db.session.commit()
+
+        return jsonify({'message': 'vault was updated'})
+
+    if request.method == 'DELETE':
+
+        if not current_user.public_id == public_id:
+            return jsonify({'message': 'permission denied'})
+
+        vault = Vault.query.filter_by(vault_id=vault_id).first()
+
+        if not vault:
+            return jsonify({'message': 'there is no vault like this'})
+
+        db.session.delete(vault)
+        db.session.commit()
+
+        return jsonify({"message": "vault was deleted"})
 
 
 @app.route('/user/<public_id>/file/create', methods=['POST'])
@@ -308,7 +333,7 @@ def file_list(current_user, public_id, vault_id):
     return jsonify({'Files': output})
 
 
-@app.route('/user/<public_id>/file/<file_id>/update')
+@app.route('/user/<public_id>/file/<file_id>', methods=['PUT', "DELETE"])
 @token_required
 def file_update(current_user, public_id, file_id):
 
@@ -317,35 +342,34 @@ def file_update(current_user, public_id, file_id):
     if not current_user.public_id == public_id:
         return jsonify({'message': 'permission denied'})
 
-    file = File.query.filter_by(file_id=file_id).first()
+    if request.method == 'PUT':
 
-    if not file:
-        return jsonify({'message': 'there is no such file'})
+        file = File.query.filter_by(file_id=file_id).first()
 
-    file.name = data['name']
-    file.description = data['description']
+        if not file:
+            return jsonify({'message': 'there is no such file'})
 
-    db.session.commit()
+        if 'name' in data:
+            file.name = data['name']
 
-    return jsonify({"message": "file updated"})
+        if 'description' in data:
+            file.description = data['description']
 
+        db.session.commit()
 
-@app.route('/user/<public_id>/file/<file_id>', methods=['DELETE'])
-@token_required
-def delete_file(current_user, public_id, file_id):
+        return jsonify({"message": "file updated"})
 
-    if not current_user.public_id == public_id:
-        return jsonify({'message': 'permission denied'})
+    if request.method == 'DELETE':
 
-    file = File.query.filter_by(file_id=file_id).first()
+        file = File.query.filter_by(file_id=file_id).first()
 
-    if not file:
-        return jsonify({'message': 'there is no file like this'})
+        if not file:
+            return jsonify({'message': 'there is no file like this'})
 
-    db.session.delete(file)
-    db.session.commit()
+        db.session.delete(file)
+        db.session.commit()
 
-    return jsonify({"message": "file was deleted"})
+        return jsonify({"message": "file was deleted"})
 
 
 if __name__ == '__main__':
