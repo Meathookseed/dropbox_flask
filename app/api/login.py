@@ -2,7 +2,7 @@ from app.api import bp
 from flask import request, make_response, jsonify, current_app
 from werkzeug.security import check_password_hash
 import jwt
-from app.models import User
+from app.api.models.models import User
 
 
 @bp.route('/login')

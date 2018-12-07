@@ -1,8 +1,8 @@
 from flask import jsonify,request
 from app import db
 from app.api import bp
-from app.models import Vault
-from app.api.utils.token import token_required
+from app.api.models.models import Vault
+from app.api.decorators.token import token_required
 
 
 @bp.route('/user/<public_id>/vault/create', methods=['POST'])

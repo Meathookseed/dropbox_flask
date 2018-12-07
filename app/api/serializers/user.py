@@ -1,5 +1,5 @@
 from app import ma
-from app.models import User
+from app.api.models.user import User
 
 
 class UserSchema(ma.ModelSchema):

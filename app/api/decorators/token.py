@@ -1,6 +1,6 @@
 from flask import request, jsonify, current_app
 import jwt
-from app.models import User
+from app.api.models.user import User
 from functools import wraps
 
 

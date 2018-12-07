@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from app import db
-from app.models import File, Vault
-from app.api.utils.token import token_required
+from app.api.models.models import File, Vault
+from app.api.decorators.token import token_required
 from app.api import bp
 
 
@@ -87,3 +87,5 @@ def file_update(current_user, public_id, file_id):
         db.session.commit()
 
         return jsonify({"message": "file was deleted"})
+
+
