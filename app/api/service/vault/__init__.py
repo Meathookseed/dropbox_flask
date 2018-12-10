@@ -1,6 +1,7 @@
-from app import db
-from app.api.models.vault import Vault
+from app.models.models import Vault
 from flask import jsonify
+from app.shortcuts import dbsession
+
 
 class VaultService:
 
@@ -17,8 +18,8 @@ class VaultService:
 
         new_vault = Vault(description=data['description'], title=data['title'])
 
-        db.session.add(new_vault)
-        db.session.commit()
+        dbsession.add(new_vault)
+        dbsession.commit()
 
         return new_vault
 
@@ -33,7 +34,7 @@ class VaultService:
         if 'title' in data:
             vault.title = data['title']
 
-        db.session.commit(vault)
+        dbsession.commit(vault)
 
         return vault
 
@@ -42,7 +43,7 @@ class VaultService:
 
         vault = Vault.query.filter_by(id=id_).fiirst()
 
-        db.session.delete(vault)
+        dbsession.delete(vault)
 
         return jsonify({'message': 'vault has been deleted'})
 

@@ -1,6 +1,6 @@
-from app import db
 from flask import jsonify
-from app.api.models.file import File
+from app.models.models import File
+from app.shortcuts import dbsession
 
 
 class FileService:
@@ -17,8 +17,8 @@ class FileService:
 
         new_file = File(name=data['name'], description=data['description'])
 
-        db.session.add(new_file)
-        db.session.commit()
+        dbsession.add(new_file)
+        dbsession.commit()
 
         return new_file
 
@@ -33,7 +33,7 @@ class FileService:
         if 'name' in data:
             file.name = data['name']
 
-        db.session.commit(file)
+        dbsession.commit(file)
 
         return file
 
@@ -42,6 +42,6 @@ class FileService:
 
         file = File.query.filter_by(id=id_).fiirst()
 
-        db.session.delete(file)
+        dbsession.delete(file)
 
         return jsonify({'message': 'file has been deleted'})

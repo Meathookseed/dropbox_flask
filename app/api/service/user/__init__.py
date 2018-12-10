@@ -1,9 +1,10 @@
-from app import db
-from flask import jsonify, current_app
-from app.api.models.user import User
+from flask import jsonify, current_app, request
+from app.models.models import User
 import uuid
 from werkzeug.security import generate_password_hash
 import jwt
+from app.api.serializers.user import UserSchema
+from app.shortcuts import dbsession
 
 
 class UserService:
@@ -12,23 +13,35 @@ class UserService:
         self.name = 'users'
 
     @staticmethod
-    def list():
+    def list(current_user):
+
+        # if not current_user.admin:
+        #     return jsonify({'message': 'permission denied'})
 
         users = User.query.all()
 
-        return users
+        user_schema = UserSchema(many=True)
+
+        output = user_schema.dump(users).data
+        print(output)
+        return jsonify({"users": output})
 
     @staticmethod
-    def one(id_):
+    def one(current_user, public_id):
 
-        user = User.query.filter_by(id=id_).first()
+        # if not current_user.public_id == public_id:
+        #     return jsonify({'message': 'permission denied'})
 
-        return user
+        user = User.query.filter_by(public_id=public_id).first()
+
+        user_schema = UserSchema()
+
+        output = user_schema.dump(user).data
+
+        return jsonify({'user': output})
 
     @staticmethod
     def create(data):
-
-        public_id = str(uuid.uuid4())
 
         hashed_password = generate_password_hash(data['password'])
 
@@ -39,24 +52,29 @@ class UserService:
             'email':  data['email']
         }
 
-        new_user = User(public_id=public_id,
+        new_user = User(public_id=str(uuid.uuid4()),
                         username=inner_json['username'],
                         password=inner_json['password'],
                         admin=inner_json['admin'],
                         email=inner_json['email'])
 
-        db.session.add(new_user)
-        db.session.commit()
+        print(new_user.__dict__)
+
+        dbsession.add(new_user)
+        dbsession.commit()
 
         token = jwt.encode({'public_id': new_user.public_id},
-                           current_app.config['secret_key'])
+                           current_app.config['SECRET_KEY'])
 
-        return token.decode("UTF-8")
+        return jsonify({'token': token})
 
     @staticmethod
-    def update(data, id_):
+    def update(data, current_user, public_id):
 
-        user = User.query.filter_by(id=id_).first()
+        if not current_user.public_id == public_id:
+            return jsonify({"message": "permission denied"})
+
+        user = User.query.filter_by(public_id=public_id).first()
 
         if 'admin' in data:
             user.admin = data['admin']
@@ -70,17 +88,20 @@ class UserService:
         if 'username' in data:
             user.username = data['username']
 
-        db.session.commit()
+        dbsession.commit()
 
-        return user
+        return jsonify({'message': 'user updated'})
 
     @staticmethod
-    def delete(id_):
+    def delete(current_user, public_id):
 
-        user = User.query.filter_by(id=id_).first()
+        if not current_user.public_id == public_id:
+            return jsonify({'message': "permission denied"})
 
-        db.session.delete(user)
-        db.session.commit()
+        user = User.query.filter_by(public_id=public_id).first()
+
+        dbsession.delete(user)
+
+        dbsession.commit()
 
         return jsonify({'message': 'user was deleted'})
-

@@ -1,14 +1,8 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_marshmallow import Marshmallow
+from app.extensions import db, ma, migrate
 from config import Config
 from flask_cors import CORS
-
-
-db = SQLAlchemy()
-migrate = Migrate()
-ma = Marshmallow()
+from app.api.users import UserView
 
 
 def create_app(config_class=Config):
@@ -23,8 +17,7 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     ma.init_app(app)
 
-    from app.api.users import UserView
-    UserView.register(app)
+    UserView.register(app, route_base='/')
 
     return app
 
