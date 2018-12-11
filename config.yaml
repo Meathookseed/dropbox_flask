@@ -1,0 +1,6 @@
+version: "3.0"
+debug: true
+testing: false
+csrf_enabled: true
+secret_key: 'thisissecret'
+sqlalchemy_database_uri: "postgresql:///flask_dropbox"

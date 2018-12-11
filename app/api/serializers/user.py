@@ -12,7 +12,7 @@ class UserSchema(ma.ModelSchema):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'id', 'public_id', 'vaults', 'links']
+        fields = ['username', 'password', 'id', 'public_id', 'vaults', 'links',"admin"]
 
     vaults = fields.Nested(VaultSchema, many=True)
 

@@ -1,18 +1,19 @@
 from flask import Flask
 from app.extensions import db, ma, migrate
-from config import Config
+
 from flask_cors import CORS
 from app.api.users import UserView
 from app.api.vault import VaultView
+from from_yaml import YactConfig
 
 
-def create_app(config_class=Config):
+def create_app():
 
+    Flask.config_class = YactConfig
     app = Flask(__name__)
+    app.config.from_yaml('config.yaml')
 
     CORS(app)
-
-    app.config.from_object(config_class)
 
     db.init_app(app)
     migrate.init_app(app, db)
