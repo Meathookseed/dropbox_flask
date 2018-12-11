@@ -3,6 +3,7 @@ from app.extensions import db, ma, migrate
 from config import Config
 from flask_cors import CORS
 from app.api.users import UserView
+from app.api.vault import VaultView
 
 
 def create_app(config_class=Config):
@@ -17,7 +18,8 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     ma.init_app(app)
 
-    UserView.register(app, route_base='/')
+    UserView.register(app)
+    VaultView.register(app)
 
     return app
 

@@ -1,28 +1,40 @@
-from flask_classy import FlaskView, route
-from flask_apispec.annotations import marshal_with
+from flask_classy import FlaskView
+from flask_apispec.annotations import marshal_with, doc
 from flask import request
 
 from app.api.service.user import UserService
 from app.api.serializers.user import UserSchema
-from app.api.decorators.token import token_required
 
 
 class UserView(FlaskView):
 
-    @route('users/')
     @marshal_with(UserSchema(many=True))
-    @token_required
-    def index(self, current_user):
-        return UserService.list(current_user)
+    @doc(description='Get List of all users')
+    def index(self):
+        """List of users"""
+        return UserService.list()
 
-    @route('user/<public_id>')
+
     @marshal_with(UserSchema())
-    @token_required
-    def get(self, current_user, public_id):
-        return UserService.one(current_user, public_id)
+    def get(self, public_id):
+        """Retrieve one user"""
+        return UserService.one(public_id)
 
-    @route('create_user/')
+    @doc(description='Creates new user')
     def post(self):
+        """Create User"""
         data = request.get_json()
         return UserService.create(data)
 
+
+    @doc(description='Updates user')
+    @marshal_with(UserSchema())
+    def patch(self, public_id):
+        """Update user"""
+        data = request.get_json()
+        return UserService.update(data, public_id)
+
+    @doc(description='Deletes user')
+    def delete(self, public_id):
+        """Delete User"""
+        return UserService.delete(public_id)

@@ -1,10 +1,11 @@
-from flask import jsonify, current_app, request
+from flask import jsonify, current_app, request, Response
 from app.models.models import User
 import uuid
 from werkzeug.security import generate_password_hash
 import jwt
-from app.api.serializers.user import UserSchema
+from app.api.serializers.user import UserSchema, VaultSchema
 from app.shortcuts import dbsession
+from app.api.decorators.token import token_required
 
 
 class UserService:
@@ -13,24 +14,27 @@ class UserService:
         self.name = 'users'
 
     @staticmethod
+    @token_required
     def list(current_user):
 
-        # if not current_user.admin:
-        #     return jsonify({'message': 'permission denied'})
+        if not current_user.admin:
+            return jsonify({'message': 'permission denied'})
 
         users = User.query.all()
 
         user_schema = UserSchema(many=True)
 
-        output = user_schema.dump(users).data
-        print(output)
-        return jsonify({"users": output})
+        user_result = user_schema.dump(users).data
+
+
+        return jsonify({"users": user_result})
 
     @staticmethod
+    @token_required
     def one(current_user, public_id):
 
-        # if not current_user.public_id == public_id:
-        #     return jsonify({'message': 'permission denied'})
+        if not current_user.public_id == public_id and not current_user.admin:
+            return jsonify({'message': 'permission denied'})
 
         user = User.query.filter_by(public_id=public_id).first()
 
@@ -48,17 +52,15 @@ class UserService:
         inner_json = {
             'username': data['username'],
             'password': hashed_password,
-            'admin': False,
+            'admin': data['admin'],
             'email':  data['email']
         }
-
+        
         new_user = User(public_id=str(uuid.uuid4()),
                         username=inner_json['username'],
                         password=inner_json['password'],
                         admin=inner_json['admin'],
                         email=inner_json['email'])
-
-        print(new_user.__dict__)
 
         dbsession.add(new_user)
         dbsession.commit()
@@ -66,12 +68,13 @@ class UserService:
         token = jwt.encode({'public_id': new_user.public_id},
                            current_app.config['SECRET_KEY'])
 
-        return jsonify({'token': token})
+        return jsonify({'token': str(token)})
 
     @staticmethod
+    @token_required
     def update(data, current_user, public_id):
 
-        if not current_user.public_id == public_id:
+        if not current_user.public_id == public_id and not current_user.admin:
             return jsonify({"message": "permission denied"})
 
         user = User.query.filter_by(public_id=public_id).first()
@@ -93,9 +96,10 @@ class UserService:
         return jsonify({'message': 'user updated'})
 
     @staticmethod
+    @token_required
     def delete(current_user, public_id):
 
-        if not current_user.public_id == public_id:
+        if not current_user.public_id == public_id and not current_user.admin:
             return jsonify({'message': "permission denied"})
 
         user = User.query.filter_by(public_id=public_id).first()
