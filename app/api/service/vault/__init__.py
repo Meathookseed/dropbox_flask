@@ -9,12 +9,13 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def list(current_user, id_):
+    def list(current_user, public_id):
 
-        if not current_user.id == id_:
+        if not current_user.public_id == public_id:
             return jsonify({'message': 'permission denied'})
 
-        vaults = Vault.query.filter_by(owner_id=id_)
+        vaults = Vault.query.filter_by(owner_id=current_user.id)
+
         schema = VaultSchema(many=True)
         output = schema.dump(vaults).data
 
@@ -24,13 +25,14 @@ class VaultService:
     @token_required
     def one(current_user, id_):
 
-        if not current_user.id == id_ and not current_user.admin:
-            return jsonify({'message': 'permission denied'})
-
         vault = Vault.query.filter_by(vault_id=id_).first()
+
+        if vault not in current_user.vaults:
+            return jsonify({'message': 'permission denied'})
 
         if not vault:
             return jsonify({"message": 'no vault'})
+
         schema = VaultSchema()
 
         output = schema.dump(vault).data
@@ -39,9 +41,9 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def create(current_user, id_, data):
+    def create(current_user, public_id, data):
 
-        if not current_user.id == id_:
+        if not current_user.public_id == public_id:
             return jsonify({'message': 'permission denied'})
 
         new_vault = Vault(description=data['description'], title=data['title'], owner_id=current_user.id)
@@ -53,12 +55,12 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def update(data, current_user, public_id, id_):
-
-        if not current_user.public_id == public_id:
-            return jsonify({'message': 'permission denied'})
+    def update(data, current_user, id_):
 
         vault = Vault.query.filter_by(id=id_).first()
+
+        if vault not in current_user.vaults:
+            return jsonify({'message': 'permission denied'})
 
         if 'description' in data:
             vault.description = data['description']
@@ -72,12 +74,12 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def delete(current_user, public_id, id_):
-
-        if not current_user.public_id == public_id:
-            return jsonify({'message': 'permission denied'})
+    def delete(current_user, id_):
 
         vault = Vault.query.filter_by(id=id_).first()
+
+        if vault not in current_user.vaults:
+            return jsonify({'message': 'permission denied'})
 
         dbsession.delete(vault)
 

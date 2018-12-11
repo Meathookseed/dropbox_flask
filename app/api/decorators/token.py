@@ -16,6 +16,7 @@ def token_required(f):
             return jsonify({'message': 'Token is missing'})
 
         try:
+
             data = jwt.decode(token, current_app.config['SECRET_KEY'])
 
             current_user = User.query.filter_by(public_id=data['public_id']).first()
