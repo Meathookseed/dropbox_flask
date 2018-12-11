@@ -4,6 +4,7 @@ from app.extensions import db, ma, migrate
 from flask_cors import CORS
 from app.api.users import UserView
 from app.api.vault import VaultView
+from app.api.login import LoginView
 from from_yaml import YactConfig
 
 
@@ -19,8 +20,10 @@ def create_app():
     migrate.init_app(app, db)
     ma.init_app(app)
 
+    LoginView.register(app)
     UserView.register(app)
     VaultView.register(app)
+
 
     return app
 
