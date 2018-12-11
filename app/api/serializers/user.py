@@ -1,27 +1,23 @@
-
-from marshmallow import Schema,fields, ValidationError
-
-
-class VaultSchema(Schema):
-    vault_id = fields.Integer(dump_only=True)
-    owner_id = fields.Integer(dump_only=True)
-    title = fields.Str()
-    description = fields.Str()
-
-def must_not_be_blank(data):
-    if not data:
-        raise ValidationError('Data not provided.')
+from app.extensions import ma
+from app.models.models import User, Vault
+from marshmallow import fields
 
 
-class UserSchema(Schema):
-    id = fields.Integer(dump_only=True)
-    public_id = fields.String()
-    username = fields.String()
-    password = fields.Str()
-    email = fields.Email()
-    files = fields.Int()
-    photo = fields.Str()
-    admin = fields.Bool()
-    vaults = fields.Nested(VaultSchema)
+class VaultSchema(ma.ModelSchema):
+    class Meta:
+        model = Vault
+
+
+class UserSchema(ma.ModelSchema):
+
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'id', 'public_id', 'vaults', 'links']
+
+    vaults = fields.Nested(VaultSchema, many=True)
+
+    links = ma.Hyperlinks({
+        'self_url': ma.URLFor('UserView:get', public_id='<public_id>')
+            })
 
 

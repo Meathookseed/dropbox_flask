@@ -10,8 +10,6 @@ from flask_apispec.annotations import marshal_with, doc
 
 class VaultView(FlaskView):
 
-
-
     @marshal_with(VaultSchema(many=True))
     @doc(description='Get List of all users vaults')
     def index(self, id_):
@@ -22,7 +20,6 @@ class VaultView(FlaskView):
     def get(self, id_):
         """Retrieve one user"""
         return VaultService.one(id_=id_)
-
 
     @doc(description='Creates new user')
     def post(self, id_):

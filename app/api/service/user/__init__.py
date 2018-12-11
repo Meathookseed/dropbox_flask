@@ -3,7 +3,7 @@ from app.models.models import User
 import uuid
 from werkzeug.security import generate_password_hash
 import jwt
-from app.api.serializers.user import UserSchema, VaultSchema
+from app.api.serializers.user import UserSchema
 from app.shortcuts import dbsession
 from app.api.decorators.token import token_required
 
@@ -25,7 +25,6 @@ class UserService:
         user_schema = UserSchema(many=True)
 
         user_result = user_schema.dump(users).data
-
 
         return jsonify({"users": user_result})
 
