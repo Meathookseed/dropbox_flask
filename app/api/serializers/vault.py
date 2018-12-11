@@ -12,8 +12,8 @@ class VaultSchema(ma.ModelSchema):
 
     class Meta:
         model = Vault
-        fields = ['title', 'description', 'files', '_links']
+        fields = ['title', 'description', 'files', '_links', "owner_id"]
 
     _links = ma.Hyperlinks({
-        'self':ma.URLFor('VaultView:get', id_='<vault_id>'),
+        'self': ma.URLFor('VaultView:get', id_='<vault_id>'),
     })
