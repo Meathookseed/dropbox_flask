@@ -10,6 +10,7 @@ from flask_apispec.annotations import marshal_with, doc
 
 class VaultView(FlaskView):
 
+    @route('user_<public_id>')
     @marshal_with(VaultSchema(many=True))
     @doc(description='Get List of all users vaults, <public_id> - user prop')
     def index(self, public_id):
