@@ -73,7 +73,7 @@ class UserService:
         token = jwt.encode({'public_id': new_user.public_id},
                            current_app.config['SECRET_KEY'])
 
-        return jsonify({'token': token.decode('utf-8')})
+        return jsonify({'token': token.decode('utf-8'), 'id': new_user.id})
 
     @staticmethod
     @token_required

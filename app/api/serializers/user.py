@@ -25,11 +25,11 @@ class UserSchema(ma.ModelSchema):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'id', 'public_id', 'vaults', '_links', "admin"]
+        fields = ['username', 'password', 'id', 'public_id', 'vaults', 'links', "admin"]
 
     vaults = fields.Nested(VaultSchema, many=True)
 
-    _links = ma.Hyperlinks({
+    links = ma.Hyperlinks({
         'user_self_url': ma.URLFor('UserView:get', id_='<id>')
             })
 
