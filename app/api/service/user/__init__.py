@@ -22,6 +22,9 @@ class UserService:
 
         users = User.query.all()
 
+        if not users:
+            return jsonify({'message': "there is no users yet"})
+
         user_schema = UserSchema(many=True)
 
         user_result = user_schema.dump(users).data
@@ -30,12 +33,15 @@ class UserService:
 
     @staticmethod
     @token_required
-    def one(current_user, public_id):
+    def one(current_user, id_):
 
-        if not current_user.public_id == public_id and not current_user.admin:
+        if not current_user.id == int(id_) and not current_user.admin:
             return jsonify({'message': 'permission denied'})
 
-        user = User.query.filter_by(public_id=public_id).first()
+        user = User.query.filter_by(id=int(id_)).first()
+
+        if not user:
+            return jsonify({'message': "there is no users"})
 
         user_schema = UserSchema()
 
@@ -51,10 +57,10 @@ class UserService:
         inner_json = {
             'username': data['username'],
             'password': hashed_password,
-            'admin': data['admin'],
+            'admin': False,
             'email':  data['email']
         }
-        
+
         new_user = User(public_id=str(uuid.uuid4()),
                         username=inner_json['username'],
                         password=inner_json['password'],
@@ -67,16 +73,19 @@ class UserService:
         token = jwt.encode({'public_id': new_user.public_id},
                            current_app.config['SECRET_KEY'])
 
-        return jsonify({'token': str(token)})
+        return jsonify({'token': token.decode('utf-8')})
 
     @staticmethod
     @token_required
-    def update(data, current_user, public_id):
+    def update(data, current_user, id_):
 
-        if not current_user.public_id == public_id and not current_user.admin:
+        if not current_user.id == int(id_) and not current_user.admin:
             return jsonify({"message": "permission denied"})
 
-        user = User.query.filter_by(public_id=public_id).first()
+        user = User.query.filter_by(id=int(id_)).first()
+
+        if not user:
+            return jsonify({'message': "there is no user"})
 
         if 'admin' in data:
             user.admin = data['admin']
@@ -96,13 +105,15 @@ class UserService:
 
     @staticmethod
     @token_required
-    def delete(current_user, public_id):
+    def delete(current_user, id_):
 
-        if not current_user.public_id == public_id and not current_user.admin:
+        if not current_user.id == int(id_) and not current_user.admin:
             return jsonify({'message': "permission denied"})
 
-        user = User.query.filter_by(public_id=public_id).first()
+        user = User.query.filter_by(id=int(id_)).first()
 
+        if not user:
+            return jsonify({'message': "there is no user"})
         dbsession.delete(user)
 
         dbsession.commit()

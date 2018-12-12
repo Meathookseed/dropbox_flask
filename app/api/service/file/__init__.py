@@ -13,11 +13,14 @@ class FileService:
 
         files = File.query.filter_by(vault_id=vault_id)
 
-        if files not in current_user.files:
-            return jsonify({'message': 'permission denied'})
+        vault = Vault.query.filter_by(vault_id=vault_id).first()
 
-        if not files:
-            return jsonify({'message': 'no files in vault'})
+        if vault not in current_user.vaults:
+            return jsonify({'message':'permission denied'})
+
+        for file in files:
+            if not file:
+                return jsonify({'message': 'no files in vault'})
 
         file_schema = FileSchema(many=True)
 
@@ -31,11 +34,11 @@ class FileService:
 
         file = File.query.filter_by(file_id=id_).first()
 
-        if file not in current_user.files:
-            return jsonify({'message': 'permission denied'})
-
         if not file:
             return jsonify({'message': 'no such file'})
+
+        if file not in current_user.files:
+            return jsonify({'message': 'permission denied'})
 
         file_schema = FileSchema()
 
@@ -47,15 +50,17 @@ class FileService:
     @token_required
     def create(current_user, vault_id, data):
 
-        vault = Vault.query.filter_by(vault_id=vault_id)
-
-        if vault not in current_user.vaults:
-            return jsonify({"message": "permission denied"})
+        vault = Vault.query.filter_by(vault_id=vault_id).first()
 
         if not vault:
             return jsonify({'message': 'no such vault'})
 
-        new_file = File(name=data['name'], description=data['description'], vault_id=vault_id)
+        if vault not in current_user.vaults:
+            print(current_user.vaults)
+            print(vault)
+            return jsonify({"message": "permission denied"})
+
+        new_file = File(name=data['name'], description=data['description'], vault_id=vault_id, owner_id=vault.owner_id)
 
         dbsession.add(new_file)
         dbsession.commit()
@@ -66,7 +71,7 @@ class FileService:
     @token_required
     def update(current_user, data, id_):
 
-        file = File.query.filter_by(id=id_).first()
+        file = File.query.filter_by(file_id=id_).first()
 
         if not current_user.id == file.owner_id:
             return jsonify({"message": "permission denied"})
@@ -77,7 +82,7 @@ class FileService:
         if 'name' in data:
             file.name = data['name']
 
-        dbsession.commit(file)
+        dbsession.commit()
 
         return jsonify({"message": "file updated"})
 
@@ -85,11 +90,12 @@ class FileService:
     @token_required
     def delete(current_user, id_):
 
-        file = File.query.filter_by(id=id_).fiirst()
+        file = File.query.filter_by(file_id=id_).first()
 
         if not current_user.id == file.owner_id:
             return jsonify({"message": "permission denied"})
 
         dbsession.delete(file)
+        dbsession.commit()
 
         return jsonify({'message': 'file has been deleted'})

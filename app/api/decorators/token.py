@@ -3,6 +3,7 @@ import jwt
 from functools import wraps
 from app.models.models import User
 
+
 def token_required(f):
 
     @wraps(f)

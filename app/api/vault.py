@@ -10,14 +10,14 @@ from flask_apispec.annotations import marshal_with, doc
 
 class VaultView(FlaskView):
 
-    @route('user_<public_id>')
+    @route('user_<id_>')
     @marshal_with(VaultSchema(many=True))
     @doc(description='Get List of all users vaults, <public_id> - user prop')
-    def index(self, public_id):
+    def index(self, id_):
         """List of users"""
-        return VaultService.list(public_id=public_id)
+        return VaultService.list(id_=id_)
 
-    @marshal_with(VaultSchema())
+    @marshal_with(VaultSchema)
     @doc(description='Retrieve one vault, <id_> - vault prop')
     def get(self, id_):
         """Retrieve one user"""
@@ -30,7 +30,7 @@ class VaultView(FlaskView):
         return VaultService.create(data=data, public_id=public_id)
 
     @doc(description='Updates vault, <id_> - vault prop')
-    @marshal_with(VaultSchema())
+    @marshal_with(VaultSchema)
     def patch(self, id_):
         """Update user"""
         data = request.get_json()

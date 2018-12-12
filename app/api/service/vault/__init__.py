@@ -9,9 +9,9 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def list(current_user, public_id):
+    def list(current_user, id_):
 
-        if not current_user.public_id == public_id:
+        if not current_user.id == int(id_):
             return jsonify({'message': 'permission denied'})
 
         vaults = Vault.query.filter_by(owner_id=current_user.id)
@@ -68,7 +68,7 @@ class VaultService:
         if 'title' in data:
             vault.title = data['title']
 
-        dbsession.commit(vault)
+        dbsession.commit()
 
         return jsonify({'message': 'vault updated'})
 

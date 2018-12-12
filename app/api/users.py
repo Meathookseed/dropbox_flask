@@ -14,27 +14,19 @@ class UserView(FlaskView):
         """List of users"""
         return UserService.list()
 
-
-    @marshal_with(UserSchema())
-    def get(self, public_id):
+    @marshal_with(UserSchema)
+    def get(self, id_):
         """Retrieve one user"""
-        return UserService.one(public_id)
-
-    @doc(description='Creates new user')
-    def post(self):
-        """Create User"""
-        data = request.get_json()
-        return UserService.create(data)
-
+        return UserService.one(id_)
 
     @doc(description='Updates user')
-    @marshal_with(UserSchema())
-    def patch(self, public_id):
+    @marshal_with(UserSchema)
+    def patch(self, id_):
         """Update user"""
         data = request.get_json()
-        return UserService.update(data, public_id)
+        return UserService.update(data, id_)
 
     @doc(description='Deletes user')
-    def delete(self, public_id):
+    def delete(self, id_):
         """Delete User"""
-        return UserService.delete(public_id)
+        return UserService.delete(id_)

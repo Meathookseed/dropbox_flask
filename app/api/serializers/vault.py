@@ -1,5 +1,6 @@
 from app.extensions import ma
 from app.models.models import Vault, File
+from marshmallow import fields
 
 
 class FileSchema(ma.ModelSchema):
@@ -8,7 +9,7 @@ class FileSchema(ma.ModelSchema):
 
 
 class VaultSchema(ma.ModelSchema):
-    files = FileSchema(many=True)
+    files = fields.Nested(FileSchema, many=True)
 
     class Meta:
         model = Vault
