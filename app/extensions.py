@@ -6,7 +6,7 @@ from flask_cors import CORS
 
 db = SQLAlchemy()
 
-migrate = Migrate()
+migrate = Migrate(compare_type=True)
 
 ma = Marshmallow()
 

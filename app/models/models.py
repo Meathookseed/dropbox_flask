@@ -2,6 +2,7 @@ from app.extensions import db
 
 
 class User(db.Model):
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     public_id = db.Column(db.String())
     username = db.Column(db.String(100), unique=True)
@@ -9,7 +10,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     vaults = db.relationship('Vault')
     files = db.relationship('File')
-    photo = db.Column(db.LargeBinary)
+    photo = db.Column(db.String(100))
     admin = db.Column(db.Boolean)
 
 

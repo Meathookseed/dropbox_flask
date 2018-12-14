@@ -1,9 +1,9 @@
-from flask_classy import FlaskView
+from flask_classy import FlaskView, route
 from flask_apispec.annotations import marshal_with, doc
 from flask import request
 from app.api.service.user import UserService
 from app.api.serializers.user import UserSchema
-
+from app.api.service.photo import PhotoService
 
 @marshal_with(UserSchema)
 class UserView(FlaskView):

@@ -24,7 +24,7 @@ def upgrade():
     sa.Column('username', sa.String(length=100), nullable=True),
     sa.Column('password', sa.String(length=100), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
-    sa.Column('photo', sa.LargeBinary(), nullable=True),
+    sa.Column('photo', sa.String(), nullable=True),
     sa.Column('admin', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
@@ -50,6 +50,8 @@ def upgrade():
     sa.ForeignKeyConstraint(['vault_id'], ['vault.vault_id'], ),
     sa.PrimaryKeyConstraint('file_id')
     )
+
+
     # ### end Alembic commands ###
 
 

@@ -57,15 +57,17 @@ class UserService:
         inner_json = {
             'username': data['username'],
             'password': hashed_password,
-            'admin': False,
-            'email':  data['email']
+            'admin': True,
+            'email':  data['email'],
+
         }
 
         new_user = User(public_id=str(uuid.uuid4()),
                         username=inner_json['username'],
                         password=inner_json['password'],
                         admin=inner_json['admin'],
-                        email=inner_json['email'])
+                        email=inner_json['email'],
+                        )
 
         dbsession.add(new_user)
         dbsession.commit()
@@ -98,6 +100,7 @@ class UserService:
 
         if 'username' in data:
             user.username = data['username']
+
 
         dbsession.commit()
 
