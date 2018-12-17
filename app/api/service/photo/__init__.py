@@ -1,20 +1,23 @@
-from app.api.serializers.photo import PhotoSerializer
-from app.models.models import User
-from flask import jsonify, current_app
-from werkzeug.utils import secure_filename
-from app.shortcuts import dbsession
-import os
 from app.api.decorators.token import token_required
+from app.models.models import User
+from app.shortcuts import dbsession
+
+from flask import jsonify, current_app
+
+import os
+
+from werkzeug.utils import secure_filename
+
 
 class PhotoService:
 
     @staticmethod
     @token_required
-    def create(current_user, photo, id_):
+    def create(current_user, photo, id):
 
         try:
 
-            if not current_user.id == id_:
+            if not current_user.id == id:
                 return jsonify({"message": "permission denied"})
 
         except AttributeError:
@@ -27,12 +30,10 @@ class PhotoService:
 
         photo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
 
-        user = User.query.filter_by(id=id_).first()
+        user = User.query.filter_by(id=id).first()
 
         user.photo = file_folder
 
-        print(user.photo)
-
         dbsession.commit()
 
-        return jsonify({'message':'photo uploaded'})
+        return jsonify({'message': 'photo uploaded'})

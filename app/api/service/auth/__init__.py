@@ -1,7 +1,10 @@
-from flask import jsonify, make_response, current_app
-from werkzeug.security import check_password_hash
-import jwt
 from app.models.models import User
+
+from flask import jsonify, make_response, current_app
+
+import jwt
+
+from werkzeug.security import check_password_hash
 
 
 class AuthService:
@@ -9,8 +12,11 @@ class AuthService:
     @staticmethod
     def login(data):
 
-        if not data or not data['username'] or not data['password']:
-            return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
+        try:
+            if not data or not data['username'] or not data['password']:
+                return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
+        except KeyError:
+            return make_response('Wrong data', 401)
 
         user = User.query.filter_by(username=data['username']).first()
 

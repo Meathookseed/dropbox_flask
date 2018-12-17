@@ -1,5 +1,5 @@
-from app.models.models import User
 from app.extensions import ma
+from app.models.models import User
 
 
 class PhotoSerializer(ma.ModelSchema):

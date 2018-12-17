@@ -1,7 +1,10 @@
-from flask_classy import FlaskView
-from flask_apispec.annotations import doc
-from flask import request
 from app.api.service.auth import AuthService
+
+from flask import request
+
+from flask_apispec.annotations import doc
+
+from flask_classy import FlaskView
 
 
 class LoginView(FlaskView):

@@ -1,7 +1,10 @@
-from flask_classy import FlaskView
 from app.api.service.user import UserService
-from flask_apispec.annotations import doc
+
 from flask import request
+
+from flask_classy import FlaskView
+
+from flask_apispec.annotations import doc
 
 
 class RegistrationView(FlaskView):

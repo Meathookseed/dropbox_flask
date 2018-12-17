@@ -1,8 +1,8 @@
-from flask import jsonify
-from app.models.models import File, Vault
-from app.shortcuts import dbsession
 from app.api.decorators.token import token_required
 from app.api.serializers.file import FileSchema
+from app.models.models import File, Vault
+from app.shortcuts import dbsession
+from flask import jsonify
 
 
 class FileService:
@@ -16,7 +16,7 @@ class FileService:
         vault = Vault.query.filter_by(vault_id=vault_id).first()
 
         if vault not in current_user.vaults:
-            return jsonify({'message':'permission denied'})
+            return jsonify({'message': 'permission denied'})
 
         for file in files:
             if not file:
@@ -30,9 +30,9 @@ class FileService:
 
     @staticmethod
     @token_required
-    def one(current_user, id_):
+    def one(current_user, id):
 
-        file = File.query.filter_by(file_id=id_).first()
+        file = File.query.filter_by(file_id=id).first()
 
         if not file:
             return jsonify({'message': 'no such file'})
@@ -60,18 +60,22 @@ class FileService:
             print(vault)
             return jsonify({"message": "permission denied"})
 
-        new_file = File(name=data['name'], description=data['description'], vault_id=vault_id, owner_id=vault.owner_id)
+        new_file = File(name=data['name'],
+                        description=data['description'],
+                        vault_id=vault_id,
+                        owner_id=vault.owner_id)
 
         dbsession.add(new_file)
+
         dbsession.commit()
 
         return jsonify({'message': 'file created'})
 
     @staticmethod
     @token_required
-    def update(current_user, data, id_):
+    def update(current_user, data, id):
 
-        file = File.query.filter_by(file_id=id_).first()
+        file = File.query.filter_by(file_id=id).first()
 
         if not current_user.id == file.owner_id:
             return jsonify({"message": "permission denied"})
@@ -88,9 +92,9 @@ class FileService:
 
     @staticmethod
     @token_required
-    def delete(current_user, id_):
+    def delete(current_user, id):
 
-        file = File.query.filter_by(file_id=id_).first()
+        file = File.query.filter_by(file_id=id).first()
 
         if not current_user.id == file.owner_id:
             return jsonify({"message": "permission denied"})

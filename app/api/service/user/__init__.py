@@ -1,11 +1,15 @@
-from flask import jsonify, current_app, request, Response
-from app.models.models import User
-import uuid
-from werkzeug.security import generate_password_hash
-import jwt
-from app.api.serializers.user import UserSchema
-from app.shortcuts import dbsession
 from app.api.decorators.token import token_required
+from app.api.serializers.user import UserSchema
+from app.models.models import User
+from app.shortcuts import dbsession
+
+from flask import jsonify, current_app
+
+import uuid
+
+import jwt
+
+from werkzeug.security import generate_password_hash
 
 
 class UserService:
@@ -33,12 +37,12 @@ class UserService:
 
     @staticmethod
     @token_required
-    def one(current_user, id_):
+    def one(current_user, id):
 
-        if not current_user.id == int(id_) and not current_user.admin:
+        if not current_user.id == int(id) and not current_user.admin:
             return jsonify({'message': 'permission denied'})
 
-        user = User.query.filter_by(id=int(id_)).first()
+        user = User.query.filter_by(id=int(id)).first()
 
         if not user:
             return jsonify({'message': "there is no users"})
@@ -79,12 +83,12 @@ class UserService:
 
     @staticmethod
     @token_required
-    def update(data, current_user, id_):
+    def update(data, current_user, id):
 
-        if not current_user.id == int(id_) and not current_user.admin:
+        if not current_user.id == int(id) and not current_user.admin:
             return jsonify({"message": "permission denied"})
 
-        user = User.query.filter_by(id=int(id_)).first()
+        user = User.query.filter_by(id=int(id)).first()
 
         if not user:
             return jsonify({'message': "there is no user"})
@@ -101,19 +105,18 @@ class UserService:
         if 'username' in data:
             user.username = data['username']
 
-
         dbsession.commit()
 
         return jsonify({'message': 'user updated'})
 
     @staticmethod
     @token_required
-    def delete(current_user, id_):
+    def delete(current_user, id):
 
-        if not current_user.id == int(id_) and not current_user.admin:
+        if not current_user.id == int(id) and not current_user.admin:
             return jsonify({'message': "permission denied"})
 
-        user = User.query.filter_by(id=int(id_)).first()
+        user = User.query.filter_by(id=int(id)).first()
 
         if not user:
             return jsonify({'message': "there is no user"})

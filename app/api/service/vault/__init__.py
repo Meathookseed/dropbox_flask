@@ -1,17 +1,18 @@
-from app.models.models import Vault
-from flask import jsonify
-from app.shortcuts import dbsession
 from app.api.decorators.token import token_required
 from app.api.serializers.vault import VaultSchema
+from app.models.models import Vault
+from app.shortcuts import dbsession
+
+from flask import jsonify
 
 
 class VaultService:
 
     @staticmethod
     @token_required
-    def list(current_user, id_):
+    def list(current_user, id):
 
-        if not current_user.id == int(id_):
+        if not current_user.id == int(id):
             return jsonify({'message': 'permission denied'})
 
         vaults = Vault.query.filter_by(owner_id=current_user.id)
@@ -23,9 +24,9 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def one(current_user, id_):
+    def one(current_user, id):
 
-        vault = Vault.query.filter_by(vault_id=id_).first()
+        vault = Vault.query.filter_by(vault_id=id).first()
 
         if vault not in current_user.vaults:
             return jsonify({'message': 'permission denied'})
@@ -46,7 +47,9 @@ class VaultService:
         if not current_user.public_id == public_id:
             return jsonify({'message': 'permission denied'})
 
-        new_vault = Vault(description=data['description'], title=data['title'], owner_id=current_user.id)
+        new_vault = Vault(description=data['description'],
+                          title=data['title'],
+                          owner_id=current_user.id)
 
         dbsession.add(new_vault)
         dbsession.commit()
@@ -55,9 +58,9 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def update(data, current_user, id_):
+    def update(data, current_user, id):
 
-        vault = Vault.query.filter_by(id=id_).first()
+        vault = Vault.query.filter_by(id=id).first()
 
         if vault not in current_user.vaults:
             return jsonify({'message': 'permission denied'})
@@ -74,9 +77,9 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def delete(current_user, id_):
+    def delete(current_user, id):
 
-        vault = Vault.query.filter_by(id=id_).first()
+        vault = Vault.query.filter_by(id=id).first()
 
         if vault not in current_user.vaults:
             return jsonify({'message': 'permission denied'})

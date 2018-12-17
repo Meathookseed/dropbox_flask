@@ -18,10 +18,10 @@ class FileView(FlaskView):
         return FileService.list(vault_id=vault_id)
 
     @marshal_with(FileSchema)
-    @doc(description='Retrieve one file, <id_> - file prop')
-    def get(self, id_):
+    @doc(description='Retrieve one file, <id> - file prop')
+    def get(self, id):
         """Retrieve one user"""
-        return FileService.one(id_=id_)
+        return FileService.one(id=id)
 
     @doc(description='Creates new file, <vault_id> - vault prop')
     def post(self, vault_id):
@@ -29,14 +29,14 @@ class FileView(FlaskView):
         data = request.get_json()
         return FileService.create(data=data, vault_id=vault_id)
 
-    @doc(description='Updates file, <id_> - file prop')
+    @doc(description='Updates file, <id> - file prop')
     @marshal_with(FileSchema)
-    def patch(self, id_):
+    def patch(self, id):
         """Update user"""
         data = request.get_json()
-        return FileService.update(data=data, id_=id_)
+        return FileService.update(data=data, id=id)
 
-    @doc(description='Deletes file, <id_> - file prop ')
-    def delete(self, id_):
+    @doc(description='Deletes file, <id> - file prop ')
+    def delete(self, id):
         """Delete User"""
-        return FileService.delete(id_=id_)
+        return FileService.delete(id=id)
