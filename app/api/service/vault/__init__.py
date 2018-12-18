@@ -42,9 +42,9 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def create(current_user, public_id, data):
+    def create(current_user, id, data):
 
-        if not current_user.public_id == public_id:
+        if not current_user.id == id:
             return jsonify({'message': 'permission denied'})
 
         new_vault = Vault(description=data['description'],

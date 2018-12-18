@@ -24,10 +24,10 @@ class VaultView(FlaskView):
         return VaultService.one(id=id)
 
     @doc(description='Creates new vault, <public_id> - user prop')
-    def post(self, public_id):
+    def post(self, id):
         """Create User"""
         data = request.get_json()
-        return VaultService.create(data=data, public_id=public_id)
+        return VaultService.create(data=data, id=id)
 
     @doc(description='Updates vault, <id> - vault prop')
     @marshal_with(VaultSchema)
