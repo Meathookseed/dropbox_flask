@@ -26,6 +26,7 @@ class FileView(FlaskView):
     @doc(description='Creates new file, <vault_id> - vault prop')
     def post(self, vault_id):
         """Create User"""
+
         data = request.get_json()
         return FileService.create(data=data, vault_id=vault_id)
 

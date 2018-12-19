@@ -4,6 +4,7 @@ from app.models.models import File, Vault
 from app.shortcuts import dbsession
 from flask import jsonify
 
+import os
 
 class FileService:
 
@@ -56,8 +57,6 @@ class FileService:
             return jsonify({'message': 'no such vault'})
 
         if vault not in current_user.vaults:
-            print(current_user.vaults)
-            print(vault)
             return jsonify({"message": "permission denied"})
 
         new_file = File(name=data['name'],
@@ -69,7 +68,7 @@ class FileService:
 
         dbsession.commit()
 
-        return jsonify({'message': 'file created'})
+        return jsonify({"file_id": new_file.file_id})
 
     @staticmethod
     @token_required
@@ -101,5 +100,7 @@ class FileService:
 
         dbsession.delete(file)
         dbsession.commit()
+
+        os.remove(file.data)
 
         return jsonify({'message': 'file has been deleted'})

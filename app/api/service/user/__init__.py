@@ -61,7 +61,7 @@ class UserService:
         inner_json = {
             'username': data['username'],
             'password': hashed_password,
-            'admin': False,
+            'admin': True,
             'email':  data['email'],
 
         }

@@ -44,8 +44,11 @@ class VaultService:
     @token_required
     def create(current_user, id, data):
 
-        if not current_user.id == id:
+        if not current_user.id == int(id):
             return jsonify({'message': 'permission denied'})
+
+        if not data:
+            return jsonify({'message': 'empty'})
 
         new_vault = Vault(description=data['description'],
                           title=data['title'],
@@ -79,11 +82,11 @@ class VaultService:
     @token_required
     def delete(current_user, id):
 
-        vault = Vault.query.filter_by(id=id).first()
-
+        vault = Vault.query.filter_by(vault_id=id).first()
         if vault not in current_user.vaults:
             return jsonify({'message': 'permission denied'})
 
         dbsession.delete(vault)
+        dbsession.commit()
 
         return jsonify({'message': 'vault has been deleted'})

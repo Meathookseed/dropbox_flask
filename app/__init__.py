@@ -7,6 +7,7 @@ from app.api.vault import VaultView
 from app.api.login import LoginView
 from app.api.file import FileView
 from app.api.photo import PhotoView
+from app.api.datafile import DataView
 from app.api.registration import RegistrationView
 from from_yaml import YactConfig
 from app.api.service.file import FileService
@@ -28,6 +29,7 @@ def create_app():
     PhotoView.register(app,trailing_slash=False)
     FileView.register(app, trailing_slash=False)
     VaultView.register(app, trailing_slash=False)
+    DataView.register(app,trailing_slash=False)
 
     return app
 

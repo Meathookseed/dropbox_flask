@@ -23,7 +23,7 @@ class VaultView(FlaskView):
         """Retrieve one user"""
         return VaultService.one(id=id)
 
-    @doc(description='Creates new vault, <public_id> - user prop')
+    @doc(description='Creates new vault, <id> - user prop')
     def post(self, id):
         """Create User"""
         data = request.get_json()

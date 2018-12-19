@@ -8,8 +8,8 @@ class User(db.Model):
     username = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    vaults = db.relationship('Vault')
-    files = db.relationship('File')
+    vaults = db.relationship('Vault', cascade='all,delete')
+    files = db.relationship('File', cascade='all,delete')
     photo = db.Column(db.String(100))
     admin = db.Column(db.Boolean)
 
@@ -19,7 +19,7 @@ class Vault(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     title = db.Column(db.String(100), unique=True)
     description = db.Column(db.String())
-    files = db.relationship('File')
+    files = db.relationship('File', cascade='all,delete')
 
 
 class File(db.Model):
