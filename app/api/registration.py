@@ -13,5 +13,4 @@ class RegistrationView(FlaskView):
     def post(self):
         """Create User"""
         data = request.get_json()
-        print(data)
         return UserService.create(data)

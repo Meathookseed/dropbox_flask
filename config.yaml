@@ -1,5 +1,7 @@
 version: "3.0"
 debug: true
+mail_username: 'shokran1337@gmail.com'
+mail_password: '39Nik1997'
 testing: false
 csrf_enabled: true
 secret_key: 'thisissecret'
@@ -9,3 +11,7 @@ allowed_extensions: ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif']
 apispec_swagger_url: '/swagger'
 max_file_size: 1024+1
 sqlalchemy_track_modifications: true
+mail_server: 'smtp.gmail.com'
+mail_port: 587
+mail_use_tls: true
+
