@@ -14,4 +14,5 @@ sqlalchemy_track_modifications: true
 mail_server: 'smtp.gmail.com'
 mail_port: 587
 mail_use_tls: true
-
+CELERY_BROKER_URL: 'redis://localhost:6379/0'
+RESULT_BACKEND: 'redis://localhost:6379/0'

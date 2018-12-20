@@ -4,7 +4,7 @@ from app.models.models import User
 from app.shortcuts import dbsession
 from app.extensions import mail
 from flask import jsonify, current_app
-
+from app.api.service.email.email import send_email
 from flask_mail import Message
 
 import uuid
@@ -15,7 +15,7 @@ import jwt
 
 from werkzeug.security import generate_password_hash
 
-import time
+
 
 class UserService:
 
@@ -84,14 +84,6 @@ class UserService:
         token = jwt.encode({'public_id': new_user.public_id},
                            current_app.config['SECRET_KEY'])
 
-        msg = Message('Registration at flask_dropbox',
-                      sender='shokran1337@gmail.com',
-                      recipients=[new_user.email])
-        msg.html = f'<h1>Hello {new_user.username}, your email is {new_user.email}</h1>'
-
-        thr = Thread(target=mail.send(msg))
-
-        thr.start()
 
         return jsonify({'token': token.decode('utf-8'), 'id': new_user.id})
 
