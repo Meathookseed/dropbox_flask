@@ -11,6 +11,7 @@ import jwt
 
 from werkzeug.security import generate_password_hash
 
+import tasks
 
 
 class UserService:
@@ -76,6 +77,8 @@ class UserService:
 
         dbsession.add(new_user)
         dbsession.commit()
+
+        tasks.send_email.delay(inner_json)
 
         token = jwt.encode({'public_id': new_user.public_id},
                            current_app.config['SECRET_KEY'])

@@ -6,8 +6,6 @@ import jwt
 
 from werkzeug.security import check_password_hash
 
-from tasks import send_email
-
 
 class AuthService:
 
@@ -29,7 +27,6 @@ class AuthService:
             token = jwt.encode({'public_id': user.public_id},
                                current_app.config['SECRET_KEY'])
 
-            send_email.delay()
             return jsonify({'token': token.decode("UTF-8"), 'id': user.id})
 
         return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})

@@ -1,6 +1,7 @@
 from celery import Celery
 from app import create_app
 
+
 def create_celery_app(app=None):
     app = app or create_app()
     celery = Celery('app',
