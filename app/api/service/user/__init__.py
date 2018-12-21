@@ -2,14 +2,10 @@ from app.api.decorators.token import token_required
 from app.api.serializers.user import UserSchema
 from app.models.models import User
 from app.shortcuts import dbsession
-from app.extensions import mail
+
 from flask import jsonify, current_app
-from app.api.service.email.email import send_email
-from flask_mail import Message
 
 import uuid
-
-from threading import Thread
 
 import jwt
 

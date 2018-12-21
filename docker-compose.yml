@@ -9,10 +9,11 @@ services:
       - .:/app
     depends_on:
       - postgres
-    command: bash -c "python3 main.py"
+    command: bash -c "python3 main.py && flask db init && flask db migrate && flask db upgrade"
   postgres:
     image: postgres:9.5
     env_file:
       - conf/postgres.env
     ports:
-      - 5432
+      - 5432:5433
+    tty: true
