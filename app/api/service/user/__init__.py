@@ -11,8 +11,6 @@ import jwt
 
 from werkzeug.security import generate_password_hash
 
-import tasks
-
 
 class UserService:
 
@@ -30,12 +28,7 @@ class UserService:
 
         if not users:
             return jsonify({'message': "there is no users yet"})
-
-        user_schema = UserSchema(many=True)
-
-        user_result = user_schema.dump(users).data
-
-        return jsonify({"users": user_result})
+        return users
 
     @staticmethod
     @token_required
@@ -48,12 +41,7 @@ class UserService:
 
         if not user:
             return jsonify({'message': "there is no users"})
-
-        user_schema = UserSchema()
-
-        output = user_schema.dump(user).data
-
-        return jsonify({'user': output})
+        return user
 
     @staticmethod
     def create(data):
@@ -78,11 +66,11 @@ class UserService:
         dbsession.add(new_user)
         dbsession.commit()
 
+        import tasks
         tasks.send_email.delay(inner_json)
 
         token = jwt.encode({'public_id': new_user.public_id},
                            current_app.config['SECRET_KEY'])
-
 
         return jsonify({'token': token.decode('utf-8'), 'id': new_user.id})
 

@@ -10,7 +10,7 @@ from app.api.datafile import DataView
 from app.api.registration import RegistrationView
 from from_yaml import YactConfig
 from app.api.service.file import FileService
-
+from flask_classy import FlaskView
 
 def create_app():
 
@@ -36,6 +36,8 @@ def create_app():
 
     RegistrationView.register(app)
 
+    # app.add_url_rule('/user',view_func=UserView.as_view('User'))
+    # docs.register(UserView, endpoint='User')
     UserView.register(app)
 
     PhotoView.register(app, trailing_slash=False)

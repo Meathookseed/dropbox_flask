@@ -1,7 +1,7 @@
 from app.api.service.vault import VaultService
 from app.api.serializers.vault import VaultSchema
 
-from flask import request
+from flask import request, jsonify
 
 from flask_classy import FlaskView, route
 
@@ -15,13 +15,25 @@ class VaultView(FlaskView):
     @doc(description='Get List of all users vaults, <id> - user prop')
     def index(self, id):
         """List of users"""
-        return VaultService.list(id=id)
+
+        vaults = VaultService.list(id=id)
+
+        schema = VaultSchema(many=True)
+        output = schema.dump(vaults).data
+
+        return jsonify({'vaults': output})
 
     @marshal_with(VaultSchema)
     @doc(description='Retrieve one vault, <id> - vault prop')
     def get(self, id):
         """Retrieve one user"""
-        return VaultService.one(id=id)
+        vault = VaultService.one(id=id)
+
+        schema = VaultSchema()
+
+        output = schema.dump(vault).data
+
+        return jsonify({'vault': output})
 
     @doc(description='Creates new vault, <id> - user prop')
     def post(self, id):
@@ -30,7 +42,6 @@ class VaultView(FlaskView):
         return VaultService.create(data=data, id=id)
 
     @doc(description='Updates vault, <id> - vault prop')
-    @marshal_with(VaultSchema)
     def patch(self, id):
         """Update user"""
         data = request.get_json()

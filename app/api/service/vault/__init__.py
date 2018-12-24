@@ -17,10 +17,10 @@ class VaultService:
 
         vaults = Vault.query.filter_by(owner_id=current_user.id)
 
-        schema = VaultSchema(many=True)
-        output = schema.dump(vaults).data
+        if not vaults:
+            return jsonify({'message': 'there is no vaults'})
 
-        return jsonify({'vaults': output})
+        return vaults
 
     @staticmethod
     @token_required
@@ -34,11 +34,7 @@ class VaultService:
         if not vault:
             return jsonify({"message": 'no vault'})
 
-        schema = VaultSchema()
-
-        output = schema.dump(vault).data
-
-        return jsonify({'vault': output})
+        return vault
 
     @staticmethod
     @token_required

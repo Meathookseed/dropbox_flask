@@ -1,7 +1,7 @@
 from app.api.service.user import UserService
 from app.api.serializers.user import UserSchema
 
-from flask import request
+from flask import request, jsonify
 
 from flask_classy import FlaskView
 
@@ -15,15 +15,27 @@ class UserView(FlaskView):
     @doc(description='Get List of all users')
     def index(self):
         """List of users"""
-        return UserService.list()
+
+        users = UserService.list()
+
+        user_schema = UserSchema(many=True)
+
+        user_result = user_schema.dump(users).data
+
+        return jsonify({"users": user_result})
 
     @marshal_with(UserSchema)
     def get(self, id):
         """Retrieve one user"""
-        return UserService.one(id)
+        user = UserService.one(id)
+
+        user_schema = UserSchema()
+
+        output = user_schema.dump(user).data
+
+        return jsonify({'user': output})
 
     @doc(description='Updates user')
-    @marshal_with(UserSchema)
     def patch(self, id):
         """Update user"""
         data = request.get_json()
@@ -33,6 +45,4 @@ class UserView(FlaskView):
     def delete(self, id):
         """Delete User"""
         return UserService.delete(id)
-
-
 
