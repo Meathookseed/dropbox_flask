@@ -3,7 +3,7 @@ from flask_classy import FlaskView, route
 from app.api.service.file import FileService
 from app.api.serializers.file import FileSchema
 
-from flask import request
+from flask import request, jsonify
 
 from flask_apispec.annotations import marshal_with, doc
 
@@ -15,13 +15,25 @@ class FileView(FlaskView):
     @doc(description='Get List of all files, <vault_id> - vault prop')
     def index(self, vault_id):
         """List of files"""
-        return FileService.list(vault_id=vault_id)
+        files = FileService.list(vault_id=vault_id)
+
+        file_schema = FileSchema(many=True)
+
+        output = file_schema.dump(files).data
+
+        return jsonify({'files': output})
 
     @marshal_with(FileSchema)
     @doc(description='Retrieve one file, <id> - file prop')
     def get(self, id):
         """Retrieve one user"""
-        return FileService.one(id=id)
+        file = FileService.one(id=id)
+
+        file_schema = FileSchema()
+
+        output = file_schema.dump(file).data
+
+        return jsonify({'user': output})
 
     @doc(description='Creates new file, <vault_id> - vault prop')
     def post(self, vault_id):
@@ -31,7 +43,6 @@ class FileView(FlaskView):
         return FileService.create(data=data, vault_id=vault_id)
 
     @doc(description='Updates file, <id> - file prop')
-    @marshal_with(FileSchema)
     def patch(self, id):
         """Update user"""
         data = request.get_json()

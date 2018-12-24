@@ -6,6 +6,7 @@ from flask import jsonify
 
 import os
 
+
 class FileService:
 
     @staticmethod
@@ -23,11 +24,7 @@ class FileService:
             if not file:
                 return jsonify({'message': 'no files in vault'})
 
-        file_schema = FileSchema(many=True)
-
-        output = file_schema.dump(files).data
-
-        return jsonify({'files': output})
+        return files
 
     @staticmethod
     @token_required
@@ -40,12 +37,7 @@ class FileService:
 
         if file not in current_user.files:
             return jsonify({'message': 'permission denied'})
-
-        file_schema = FileSchema()
-
-        output = file_schema.dump(file).data
-
-        return jsonify({'user': output})
+        return file
 
     @staticmethod
     @token_required
