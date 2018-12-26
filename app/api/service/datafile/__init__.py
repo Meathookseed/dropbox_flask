@@ -17,25 +17,22 @@ class DataFileService:
 
         filename = secure_filename(datafile.filename)
 
-        file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        print(file_folder)
+        file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username, filename)
 
-        datafile.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        if not os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username)):
+            os.makedirs(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username))
+
+        datafile.save(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username, filename))
 
         file = File.query.filter_by(file_id=id).first()
 
         if not file:
             return jsonify({'message': "no file"})
-        try:
-            if not current_user.id == file.owner_id:
-                return jsonify({"message": "permission denied"})
 
-        except AttributeError:
-
-            return jsonify({'error': 'not logged in'})
+        if not current_user.id == file.owner_id:
+            return jsonify({"message": "permission denied"})
 
         file.data = file_folder
-        print(file.data)
         dbsession.commit()
 
         return jsonify({'message': 'photo uploaded'})

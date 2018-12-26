@@ -1,13 +1,16 @@
 from app.api.decorators.token import token_required
-from app.api.serializers.user import UserSchema
+
 from app.models.models import User
 from app.shortcuts import dbsession
 
 from flask import jsonify, current_app
 
+import logging
+
 import uuid
 
 import jwt
+
 
 from werkzeug.security import generate_password_hash
 
@@ -21,7 +24,7 @@ class UserService:
     @token_required
     def list(current_user):
 
-        if not current_user.admin:
+        if not current_user.admin and not current_user:
             return jsonify({'message': 'permission denied'})
 
         users = User.query.all()
@@ -34,7 +37,7 @@ class UserService:
     @token_required
     def one(current_user, id):
 
-        if not current_user.id == int(id) and not current_user.admin:
+        if not current_user.id == int(id) and not current_user.admin and not current_user:
             return jsonify({'message': 'permission denied'})
 
         user = User.query.filter_by(id=int(id)).first()
@@ -55,24 +58,26 @@ class UserService:
             'email':  data['email'],
 
         }
+        try:
+            new_user = User(public_id=str(uuid.uuid4()),
+                            username=inner_json['username'],
+                            password=inner_json['password'],
+                            admin=inner_json['admin'],
+                            email=inner_json['email'],
+                            )
+            dbsession.add(new_user)
+            dbsession.commit()
+            import tasks
+            tasks.send_email.delay(inner_json)
 
-        new_user = User(public_id=str(uuid.uuid4()),
-                        username=inner_json['username'],
-                        password=inner_json['password'],
-                        admin=inner_json['admin'],
-                        email=inner_json['email'],
-                        )
+            token = jwt.encode({'public_id': new_user.public_id},
+                               current_app.config['SECRET_KEY'])
 
-        dbsession.add(new_user)
-        dbsession.commit()
+            return jsonify({'token': token.decode('utf-8'), 'id': new_user.id})
+        except:
+            logging.warning('Username and email must be unique!')
 
-        import tasks
-        tasks.send_email.delay(inner_json)
 
-        token = jwt.encode({'public_id': new_user.public_id},
-                           current_app.config['SECRET_KEY'])
-
-        return jsonify({'token': token.decode('utf-8'), 'id': new_user.id})
 
     @staticmethod
     @token_required
