@@ -6,7 +6,7 @@ import jwt
 
 from werkzeug.security import check_password_hash
 
-
+from flask_apispec import MethodResource
 class AuthService:
 
     @staticmethod

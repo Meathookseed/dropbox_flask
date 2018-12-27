@@ -17,13 +17,6 @@ class DataFileService:
 
         filename = secure_filename(datafile.filename)
 
-        file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username, filename)
-
-        if not os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username)):
-            os.makedirs(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username))
-
-        datafile.save(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username, filename))
-
         file = File.query.filter_by(file_id=id).first()
 
         if not file:
@@ -31,6 +24,13 @@ class DataFileService:
 
         if not current_user.id == file.owner_id:
             return jsonify({"message": "permission denied"})
+
+        file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username, filename)
+
+        if not os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username)):
+            os.makedirs(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username))
+
+        datafile.save(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username, filename))
 
         file.data = file_folder
         dbsession.commit()

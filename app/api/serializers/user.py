@@ -36,3 +36,4 @@ class UserSchema(ma.ModelSchema):
             })
 
 
+

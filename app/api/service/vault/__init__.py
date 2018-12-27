@@ -1,5 +1,4 @@
 from app.api.decorators.token import token_required
-from app.api.serializers.vault import VaultSchema
 from app.models.models import Vault
 from app.shortcuts import dbsession
 
