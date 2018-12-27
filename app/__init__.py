@@ -10,7 +10,7 @@ from app.api.datafile import DataView
 from app.api.registration import RegistrationView
 from from_yaml import YactConfig
 from app.api.service.file import FileService
-
+from sqlalchemy_utils import database_exists, create_database
 
 def create_app():
 
@@ -23,6 +23,10 @@ def create_app():
     app.config.from_yaml('config.yaml')
 
     mail.init_app(app)
+
+    db_url = app.config["SQLALCHEMY_DATABASE_URI"]
+    if not database_exists(db_url):
+        create_database(db_url)
 
     db.init_app(app)
 

@@ -5,7 +5,7 @@ mail_password: '39Nik1997'
 testing: false
 csrf_enabled: true
 secret_key: 'thisissecret'
-sqlalchemy_database_uri: "postgresql:///flask_dropbox"
+sqlalchemy_database_uri: "postgresql://postgres@postgres/flask_dropbox"
 upload_folder: '/home/mikita/WebstormProjects/tutorial/public/files'
 allowed_extensions: ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif']
 apispec_swagger_url: '/swagger'

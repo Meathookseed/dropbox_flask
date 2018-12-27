@@ -58,25 +58,21 @@ class UserService:
             'email':  data['email'],
 
         }
-        try:
-            new_user = User(public_id=str(uuid.uuid4()),
+        new_user = User(public_id=str(uuid.uuid4()),
                             username=inner_json['username'],
                             password=inner_json['password'],
                             admin=inner_json['admin'],
                             email=inner_json['email'],
                             )
-            dbsession.add(new_user)
-            dbsession.commit()
-            import tasks
-            tasks.send_email.delay(inner_json)
+        dbsession.add(new_user)
+        dbsession.commit()
+        import tasks
+        tasks.send_email.delay(inner_json)
 
-            token = jwt.encode({'public_id': new_user.public_id},
+        token = jwt.encode({'public_id': new_user.public_id},
                                current_app.config['SECRET_KEY'])
 
-            return jsonify({'token': token.decode('utf-8'), 'id': new_user.id})
-        except:
-            logging.warning('Username and email must be unique!')
-
+        return jsonify({'token': token.decode('utf-8'), 'id': new_user.id})
 
 
     @staticmethod

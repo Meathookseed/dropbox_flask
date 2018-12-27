@@ -1,5 +1,15 @@
-version: '3'
+version: '2.1'
 services:
+  postgres:
+    restart: always
+    image: postgres:9.5
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_DB=flask_dropbox
+    volumes:
+      - ./postgres-data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
   app:
     restart: always
     build: .
@@ -9,13 +19,6 @@ services:
       - .:/app
     depends_on:
       - postgres
-    command: bash -c "python3 main.py && flask db init && flask db migrate && flask db upgrade"
-  postgres:
-    image: postgres:9.5
-    env_file:
-      - conf/postgres.env
-    volumes:
-      - ./postgres-data/postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    tty: true
+    command:
+      bash -c 'flask db init && flask db migrate && flask db upgrade'
+    entrypoint: ["python", "main.py","runserver"]
