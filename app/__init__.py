@@ -11,6 +11,8 @@ from app.api.registration import RegistrationView
 from from_yaml import YactConfig
 from app.api.service.file import FileService
 from sqlalchemy_utils import database_exists, create_database
+import os
+
 
 def create_app():
 
@@ -24,9 +26,15 @@ def create_app():
 
     mail.init_app(app)
 
-    db_url = app.config["SQLALCHEMY_DATABASE_URI"]
-    if not database_exists(db_url):
-        create_database(db_url)
+    if os.environ.get('FLASK_ENV') == 'docker':
+        db_url = app.config["SQLALCHEMY_DATABASE_URI"]
+        if not database_exists(db_url):
+            create_database(db_url)
+
+    elif os.environ.get('FLASK_ENV') == 'development':
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///flask_dropbox'
+        if not database_exists(app.config['SQLALCHEMY_DATABASE_URI']):
+            create_database(app.config['SQLALCHEMY_DATABASE_URI'])
 
     db.init_app(app)
 
