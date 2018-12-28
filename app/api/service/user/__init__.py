@@ -66,6 +66,7 @@ class UserService:
                             )
         dbsession.add(new_user)
         dbsession.commit()
+
         import tasks
         tasks.send_email.delay(inner_json)
 

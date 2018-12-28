@@ -19,6 +19,14 @@ services:
       - .:/app
     depends_on:
       - postgres
-    command:
-      bash -c 'flask db init && flask db migrate && flask db upgrade'
+      - redis
     entrypoint: ["python", "main.py","runserver"]
+  redis:
+    image: redis
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A tasks worker --loglevel=info
+    links:
+      - redis
