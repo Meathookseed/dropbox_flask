@@ -1,6 +1,6 @@
 from app.api.service.vault import VaultService
 from app.api.serializers.vault import VaultSchema
-
+from app.extensions import socket
 from flask import request, jsonify
 
 from flask_classy import FlaskView, route
@@ -8,7 +8,9 @@ from flask_classy import FlaskView, route
 from flask_apispec.annotations import marshal_with, doc
 
 
+
 class VaultView(FlaskView):
+
 
     @route('user_<id>')
     @marshal_with(VaultSchema(many=True))
@@ -22,6 +24,7 @@ class VaultView(FlaskView):
         output = schema.dump(vaults).data
 
         return jsonify({'vaults': output})
+
 
     @marshal_with(VaultSchema)
     @doc(description='Retrieve one vault, <id> - vault prop')

@@ -15,12 +15,12 @@ class DataFileService:
     @token_required
     def create(current_user, datafile, id):
 
-        filename = secure_filename(datafile.filename)
-
         file = File.query.filter_by(file_id=id).first()
 
         if not file:
-            return jsonify({'message': "no file"})
+            file.data = None
+
+        filename = secure_filename(datafile.filename)
 
         if not current_user.id == file.owner_id:
             return jsonify({"message": "permission denied"})
@@ -31,7 +31,7 @@ class DataFileService:
             os.makedirs(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username))
 
         datafile.save(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username, filename))
-
+        print('created')
         file.data = file_folder
         dbsession.commit()
 

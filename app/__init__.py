@@ -1,5 +1,5 @@
 from flask import Flask
-from app.extensions import db, ma, migrate, docs, cors, mail
+from app.extensions import db, ma, migrate, docs, mail, cors, socket
 from app.api.serializers.user import UserSchema
 from app.api.users import UserView
 from app.api.vault import VaultView
@@ -9,6 +9,7 @@ from app.api.photo import PhotoView
 from app.api.datafile import DataView
 from app.api.registration import RegistrationView
 from from_yaml import YactConfig
+from flask_cors import CORS
 from app.api.service.file import FileService
 from sqlalchemy_utils import database_exists, create_database
 import os
@@ -22,6 +23,8 @@ def create_app():
 
     cors.init_app(app)
 
+    socket.init_app(app)
+
     app.config.from_yaml('config.yaml')
 
     mail.init_app(app)
@@ -31,7 +34,7 @@ def create_app():
         if not database_exists(db_url):
             create_database(db_url)
 
-    elif os.environ.get('FLASK_ENV') == 'development':
+    else:
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///flask_dropbox'
         if not database_exists(app.config['SQLALCHEMY_DATABASE_URI']):
             create_database(app.config['SQLALCHEMY_DATABASE_URI'])
@@ -48,16 +51,14 @@ def create_app():
 
     RegistrationView.register(app)
 
-    # app.add_url_rule('/user',view_func=UserView.as_view('User'))
-    # docs.register(UserView, endpoint='User')
     UserView.register(app)
 
-    PhotoView.register(app, trailing_slash=False)
+    PhotoView.register(app)
 
-    FileView.register(app, trailing_slash=False)
+    FileView.register(app)
 
-    VaultView.register(app, trailing_slash=False)
+    VaultView.register(app)
 
-    DataView.register(app, trailing_slash=False)
+    DataView.register(app)
 
-    return app
+    return app, socket

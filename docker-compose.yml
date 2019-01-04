@@ -20,7 +20,9 @@ services:
     depends_on:
       - postgres
       - redis
-    entrypoint: ["python", "main.py","runserver"]
+    environment:
+      FLASK_APP: main.py
+    entrypoint: ["flask", "run"]
   redis:
     image: redis
   worker:

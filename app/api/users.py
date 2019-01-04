@@ -2,13 +2,10 @@ from app.api.service.user import UserService
 from app.api.serializers.user import UserSchema
 
 from flask import request, jsonify
-
-from flask_classy import FlaskView
-
+from flask_classy import FlaskView, route
 from flask_apispec.annotations import marshal_with, doc
 
 
-@marshal_with(UserSchema)
 class UserView(FlaskView):
 
     @marshal_with(UserSchema(many=True))
@@ -24,9 +21,11 @@ class UserView(FlaskView):
 
         return jsonify({"users": user_result})
 
+    @route('<id>/')
     @marshal_with(UserSchema)
     def get(self, id):
         """Retrieve one user"""
+
         user = UserService.one(id)
 
         user_schema = UserSchema()

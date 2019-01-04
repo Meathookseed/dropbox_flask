@@ -10,12 +10,11 @@ class FileSchema(ma.ModelSchema):
 
 
 class VaultSchema(ma.ModelSchema):
+
     files = fields.Nested(FileSchema, many=True)
 
     class Meta:
         model = Vault
-        fields = ['title', 'description', 'files', '_links', "owner_id","vault_id"]
+        fields = ['title', 'description', 'files',"vault_id"]
 
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('VaultView:get', id='<vault_id>'),
-    })
+

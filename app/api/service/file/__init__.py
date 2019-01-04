@@ -93,6 +93,7 @@ class FileService:
         dbsession.delete(file)
         dbsession.commit()
 
-        os.remove(file.data)
+        if file.data:
+            os.remove(file.data)
 
         return jsonify({'message': 'file has been deleted'})

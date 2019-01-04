@@ -25,7 +25,7 @@ class VaultService:
     @token_required
     def one(current_user, id):
 
-        vault = Vault.query.filter_by(vault_id=id).first()
+        vault = Vault.query.filter_by(vault_id=int(id)).first()
 
         if vault not in current_user.vaults:
             return jsonify({'message': 'permission denied'})

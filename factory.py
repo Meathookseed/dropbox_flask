@@ -10,7 +10,7 @@ def create_celery_app(app=None):
         backend_uri = 'redis://redis'
         broker_uri = 'redis://redis:6379'
 
-    elif os.environ.get('FLASK_ENV') == 'development':
+    else:
         backend_uri = 'redis://localhost'
         broker_uri = 'redis://localhost:6379'
 

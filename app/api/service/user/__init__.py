@@ -5,7 +5,6 @@ from app.shortcuts import dbsession
 
 from flask import jsonify, current_app
 
-import logging
 
 import uuid
 
@@ -31,19 +30,21 @@ class UserService:
 
         if not users:
             return jsonify({'message': "there is no users yet"})
+
         return users
 
     @staticmethod
     @token_required
     def one(current_user, id):
 
-        if not current_user.id == int(id) and not current_user.admin and not current_user:
+        if not current_user.id == int(id) and not current_user.admin:
             return jsonify({'message': 'permission denied'})
 
         user = User.query.filter_by(id=int(id)).first()
 
         if not user:
             return jsonify({'message': "there is no users"})
+
         return user
 
     @staticmethod
@@ -66,7 +67,6 @@ class UserService:
                             )
         dbsession.add(new_user)
         dbsession.commit()
-
         import tasks
         tasks.send_email.delay(inner_json)
 

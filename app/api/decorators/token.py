@@ -15,12 +15,12 @@ def token_required(f):
 
         if 'Bearer' in request.headers:
             token = request.headers['Bearer']
-
+        elif 'Bearer' in request.args:
+            token = request.args.get('Bearer')
         if not token:
             return jsonify({'message': 'Token is missing'})
 
         try:
-
             data = jwt.decode(token, current_app.config['SECRET_KEY'])
 
             current_user = User.query.filter_by(public_id=data['public_id']).first()

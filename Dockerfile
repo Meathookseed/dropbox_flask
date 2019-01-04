@@ -7,12 +7,9 @@ RUN mkdir /app
 WORKDIR /app
 
 COPY . /app
-
-COPY . /queue
-WORKDIR /queue
+RUN chmod +x main.py
 
 RUN pip install --no-cache-dir -r requirements.txt
-
 
 ENV FLASK_ENV="docker"
 
