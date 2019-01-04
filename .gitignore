@@ -17,4 +17,4 @@ _mailinglist
 docs/_build/
 venv/
 postgres-data/
-.mypy_cache/
+.mypy_cache
