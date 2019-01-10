@@ -4,9 +4,8 @@ from app.extensions import mail
 
 celery = create_celery_app()
 
-
 @celery.task
-def send_email(data):
+def send_email(data: dict):
         msg = Message('Registration at flask_dropbox',
                       sender='shokran1337@gmail.com',
                       recipients=[data['email']])

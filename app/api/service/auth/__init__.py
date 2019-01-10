@@ -5,12 +5,13 @@ from flask import jsonify, make_response, current_app
 import jwt
 
 from werkzeug.security import check_password_hash
+from flask import Flask
 
-from flask_apispec import MethodResource
+
 class AuthService:
 
     @staticmethod
-    def login(data):
+    def login(data: dict) -> Flask:
 
         try:
             if not data or not data['username'] or not data['password']:

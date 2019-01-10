@@ -1,9 +1,9 @@
 from app.api.decorators.token import token_required
-from app.api.serializers.file import FileSchema
-from app.models.models import File, Vault
+from app.models.models import File, Vault, User
 from app.shortcuts import dbsession
 from flask import jsonify
-
+from sqlalchemy.orm import Query
+from werkzeug.local import LocalProxy
 import os
 
 
@@ -11,7 +11,7 @@ class FileService:
 
     @staticmethod
     @token_required
-    def list(current_user, vault_id):
+    def list(current_user: User, vault_id: int)-> Query:
 
         files = File.query.filter_by(vault_id=vault_id)
 
@@ -28,7 +28,7 @@ class FileService:
 
     @staticmethod
     @token_required
-    def one(current_user, id):
+    def one(current_user: User, id: int) -> Query:
 
         file = File.query.filter_by(file_id=id).first()
 
@@ -41,7 +41,7 @@ class FileService:
 
     @staticmethod
     @token_required
-    def create(current_user, vault_id, data):
+    def create(current_user: User, vault_id: int, data: dict) -> LocalProxy:
 
         vault = Vault.query.filter_by(vault_id=vault_id).first()
 
@@ -64,7 +64,7 @@ class FileService:
 
     @staticmethod
     @token_required
-    def update(current_user, data, id):
+    def update(current_user: User, data: dict, id: int) -> LocalProxy:
 
         file = File.query.filter_by(file_id=id).first()
 
@@ -83,7 +83,7 @@ class FileService:
 
     @staticmethod
     @token_required
-    def delete(current_user, id):
+    def delete(current_user: User, id: int) -> LocalProxy:
 
         file = File.query.filter_by(file_id=id).first()
 

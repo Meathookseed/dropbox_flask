@@ -10,7 +10,7 @@ from flask_apispec.annotations import doc
 class PhotoView(FlaskView):
 
     @doc(description='handle photo update of user')
-    def put(self, id):
+    def put(self, id: int):
 
         photo = request.files['photo']
 

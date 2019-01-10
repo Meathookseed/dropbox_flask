@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3'
 services:
   postgres:
     restart: always
@@ -22,7 +22,7 @@ services:
       - redis
     environment:
       FLASK_APP: main.py
-    entrypoint: ["flask", "run"]
+    entrypoint: ["python3","main.py"]
   redis:
     image: redis
   worker:

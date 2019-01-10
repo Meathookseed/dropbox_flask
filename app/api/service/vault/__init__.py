@@ -1,15 +1,17 @@
 from app.api.decorators.token import token_required
-from app.models.models import Vault
+from app.models.models import Vault, User
 from app.shortcuts import dbsession
 
 from flask import jsonify
+from sqlalchemy.orm import Query
 
+from werkzeug.local import LocalProxy
 
 class VaultService:
 
     @staticmethod
     @token_required
-    def list(current_user, id):
+    def list(current_user: User, id: int) -> Query:
 
         if not current_user.id == int(id):
             return jsonify({'message': 'permission denied'})
@@ -23,7 +25,7 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def one(current_user, id):
+    def one(current_user: User, id: int) -> Query:
 
         vault = Vault.query.filter_by(vault_id=int(id)).first()
 
@@ -37,7 +39,7 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def create(current_user, id, data):
+    def create(current_user: User, id: int, data: dict) -> LocalProxy:
 
         if not current_user.id == int(id):
             return jsonify({'message': 'permission denied'})
@@ -56,7 +58,7 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def update(data, current_user, id):
+    def update(data: dict, current_user: User, id: int) -> LocalProxy:
 
         vault = Vault.query.filter_by(id=id).first()
 
@@ -75,7 +77,7 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def delete(current_user, id):
+    def delete(current_user: User, id: int) -> LocalProxy:
 
         vault = Vault.query.filter_by(vault_id=id).first()
         if vault not in current_user.vaults:

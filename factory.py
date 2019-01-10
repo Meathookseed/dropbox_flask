@@ -1,10 +1,12 @@
-from celery import Celery
-from app import create_app
-
 import os
 
+from celery import Celery
+
+from app import create_app
+
+
 def create_celery_app(app=None):
-    app = app or create_app()
+    app, socket = app or create_app()
 
     if os.environ.get('FLASK_ENV') == 'docker':
         backend_uri = 'redis://redis'

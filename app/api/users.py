@@ -23,7 +23,7 @@ class UserView(FlaskView):
 
     @route('<id>/')
     @marshal_with(UserSchema)
-    def get(self, id):
+    def get(self, id: int):
         """Retrieve one user"""
 
         user = UserService.one(id)
@@ -35,13 +35,13 @@ class UserView(FlaskView):
         return jsonify({'user': output})
 
     @doc(description='Updates user')
-    def patch(self, id):
+    def patch(self, id: int):
         """Update user"""
         data = request.get_json()
         return UserService.update(data, id)
 
     @doc(description='Deletes user')
-    def delete(self, id):
+    def delete(self, id: int):
         """Delete User"""
         return UserService.delete(id)
 

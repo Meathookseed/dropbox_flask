@@ -7,13 +7,14 @@ from flask import jsonify, current_app
 import os
 
 from werkzeug.utils import secure_filename
+from werkzeug.local import LocalProxy
 
 
 class PhotoService:
 
     @staticmethod
     @token_required
-    def create(current_user, photo, id):
+    def create(current_user: User, photo: LocalProxy, id: int) -> LocalProxy:
 
         try:
 
