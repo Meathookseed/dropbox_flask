@@ -1,6 +1,7 @@
-from factory import create_celery_app
 from flask_mail import Message
+
 from app.extensions import mail
+from factory import create_celery_app
 
 celery = create_celery_app()
 

@@ -5,13 +5,13 @@ from flask import jsonify, make_response, current_app
 import jwt
 
 from werkzeug.security import check_password_hash
-from flask import Flask
+from flask import Response
 
 
 class AuthService:
 
     @staticmethod
-    def login(data: dict) -> Flask:
+    def login(data: dict) -> Response:
 
         try:
             if not data or not data['username'] or not data['password']:
@@ -31,4 +31,3 @@ class AuthService:
             return jsonify({'token': token.decode("UTF-8"), 'id': user.id})
 
         return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
-

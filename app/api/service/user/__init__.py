@@ -3,7 +3,7 @@ from app.api.decorators.token import token_required
 from app.models.models import User
 from app.shortcuts import dbsession
 
-from flask import jsonify, current_app
+from flask import jsonify, current_app, Response
 
 from sqlalchemy.orm import Query
 
@@ -13,7 +13,8 @@ import jwt
 
 
 from werkzeug.security import generate_password_hash
-from werkzeug.local import LocalProxy
+
+
 
 class UserService:
 
@@ -49,7 +50,7 @@ class UserService:
         return user
 
     @staticmethod
-    def create(data: dict) -> LocalProxy:
+    def create(data: dict) -> Response:
 
         hashed_password = generate_password_hash(data['password'])
 
@@ -72,16 +73,15 @@ class UserService:
         tasks.send_email.delay(inner_json)
 
         token = jwt.encode({'public_id': new_user.public_id},
-                               current_app.config['SECRET_KEY'])
+                           current_app.config['SECRET_KEY'])
 
         return jsonify({'token': token.decode('utf-8'), 'id': new_user.id})
 
-
     @staticmethod
     @token_required
-    def update(data: dict, current_user: User, id: int) -> LocalProxy:
+    def update(current_user: User, data=None, id=0) -> Response:
 
-        if not current_user.id == int(id) and not current_user.admin:
+        if not current_user.id == id and not current_user.admin:
             return jsonify({"message": "permission denied"})
 
         user = User.query.filter_by(id=int(id)).first()
@@ -107,7 +107,7 @@ class UserService:
 
     @staticmethod
     @token_required
-    def delete(current_user: User, id: int) -> LocalProxy:
+    def delete(current_user: User, id: int) -> Response:
 
         if not current_user.id == int(id) and not current_user.admin:
             return jsonify({'message': "permission denied"})

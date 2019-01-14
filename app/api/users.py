@@ -2,7 +2,7 @@ from app.api.service.user import UserService
 from app.api.serializers.user import UserSchema
 
 from flask import request, jsonify
-from flask_classy import FlaskView, route
+from flask_classful import FlaskView, route
 from flask_apispec.annotations import marshal_with, doc
 
 
@@ -38,10 +38,10 @@ class UserView(FlaskView):
     def patch(self, id: int):
         """Update user"""
         data = request.get_json()
-        return UserService.update(data, id)
+
+        return UserService.update(data=data, id=id)
 
     @doc(description='Deletes user')
     def delete(self, id: int):
         """Delete User"""
         return UserService.delete(id)
-

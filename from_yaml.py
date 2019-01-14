@@ -1,5 +1,5 @@
-from flask import Config
 import yact
+from flask import Config
 
 
 class YactConfig(Config):

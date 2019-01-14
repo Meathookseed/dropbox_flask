@@ -6,7 +6,7 @@ from app.api.serializers.vault import VaultSchema
 from app.api.service.user import UserService
 from app.api.service.vault import VaultService
 
-app, socket = create_app()
+app, socket = create_app(config_file='config.yaml')
 
 
 @socket.on('vault_events')

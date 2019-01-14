@@ -5,5 +5,4 @@ from app.models.models import File
 class FileSchema(ma.ModelSchema):
     class Meta:
         model = File
-        fields = ['vault_id',"data", "name", "description", "file_id"]
-
+        fields = ['vault_id', "data", "name", "description", "file_id"]

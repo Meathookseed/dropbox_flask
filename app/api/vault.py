@@ -3,15 +3,14 @@ from app.api.serializers.vault import VaultSchema
 
 from flask import request, jsonify
 
-from flask_classy import FlaskView, route
+from flask_classful import FlaskView, route
 
 from flask_apispec.annotations import marshal_with, doc
 
 
-
 class VaultView(FlaskView):
 
-    @route('user_<id>')
+    @route('user_<id>/')
     @marshal_with(VaultSchema(many=True))
     @doc(description='Get List of all users vaults, <id> - user prop')
     def index(self, id: int):
@@ -23,7 +22,6 @@ class VaultView(FlaskView):
         output = schema.dump(vaults).data
 
         return jsonify({'vaults': output})
-
 
     @marshal_with(VaultSchema)
     @doc(description='Retrieve one vault, <id> - vault prop')

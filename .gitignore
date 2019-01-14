@@ -20,3 +20,4 @@ postgres-data/
 .mypy_cache/
 mypy_cache/**
 .mypy_cache
+test_migrations/

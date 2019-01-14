@@ -1,4 +1,4 @@
-from flask_classy import FlaskView, route
+from flask_classful import FlaskView, route
 
 from app.api.service.file import FileService
 from app.api.serializers.file import FileSchema

@@ -14,7 +14,7 @@ from sqlalchemy_utils import database_exists, create_database
 import os
 
 
-def create_app():
+def create_app(config_file):
 
     Flask.config_class = YactConfig
 
@@ -24,7 +24,7 @@ def create_app():
 
     socket.init_app(app)
 
-    app.config.from_yaml('config.yaml')
+    app.config.from_yaml(config_file)
 
     mail.init_app(app)
 
@@ -33,8 +33,13 @@ def create_app():
         if not database_exists(db_url):
             create_database(db_url)
 
-    else:
+    elif os.environ.get('FLASK_ENV') == 'development' and app.config['TESTING'] is False:
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///flask_dropbox'
+        if not database_exists(app.config['SQLALCHEMY_DATABASE_URI']):
+            create_database(app.config['SQLALCHEMY_DATABASE_URI'])
+
+    elif app.config['TESTING'] is True:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///test_flask_dropbox'
         if not database_exists(app.config['SQLALCHEMY_DATABASE_URI']):
             create_database(app.config['SQLALCHEMY_DATABASE_URI'])
 
@@ -46,18 +51,18 @@ def create_app():
 
     docs.init_app(app)
 
-    LoginView.register(app)
+    LoginView.register(app, trailing_slash=True)
 
-    RegistrationView.register(app)
+    RegistrationView.register(app, trailing_slash=True)
 
-    UserView.register(app)
+    UserView.register(app, trailing_slash=True)
 
-    PhotoView.register(app)
+    PhotoView.register(app, trailing_slash=True)
 
-    FileView.register(app)
+    FileView.register(app, trailing_slash=True)
 
-    VaultView.register(app)
+    VaultView.register(app, trailing_slash=True)
 
-    DataView.register(app)
+    DataView.register(app, trailing_slash=True)
 
     return app, socket

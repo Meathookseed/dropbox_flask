@@ -1,0 +1,18 @@
+version: "3.0"
+debug: true
+mail_username: 'shokran1337@gmail.com'
+mail_password: '39Nik1997'
+testing: true
+csrf_enabled: true
+secret_key: 'thisissecret'
+sqlalchemy_database_uri: "postgresql:///test_flask_dropbox"
+upload_folder: '/home/mikita/WebstormProjects/tutorial/public/files'
+allowed_extensions: ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif']
+apispec_swagger_url: '/swagger'
+max_file_size: 1024+1
+sqlalchemy_track_modifications: true
+mail_server: 'smtp.gmail.com'
+mail_port: 587
+mail_use_tls: true
+CELERY_BROKER_URL: 'redis://localhost:6379/0'
+RESULT_BACKEND: 'redis://localhost:6379/0'

@@ -2,19 +2,18 @@ from app.api.decorators.token import token_required
 from app.models.models import User
 from app.shortcuts import dbsession
 
-from flask import jsonify, current_app
+from flask import jsonify, current_app, Response, Request
 
 import os
 
 from werkzeug.utils import secure_filename
-from werkzeug.local import LocalProxy
 
 
 class PhotoService:
 
     @staticmethod
     @token_required
-    def create(current_user: User, photo: LocalProxy, id: int) -> LocalProxy:
+    def create(current_user: User, photo: Request, id: int) -> Response:
 
         try:
 
