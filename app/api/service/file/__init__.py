@@ -1,7 +1,7 @@
 from app.api.decorators.token import token_required
 from app.models.models import File, Vault, User
 from app.shortcuts import dbsession
-from flask import jsonify, Response
+from flask import jsonify, make_response, Response
 from sqlalchemy.orm import Query
 import os
 
@@ -17,11 +17,11 @@ class FileService:
         vault = Vault.query.filter_by(vault_id=vault_id).first()
 
         if vault not in current_user.vaults:
-            return jsonify({'message': 'permission denied'})
+            return make_response('Forbidden', 403)
 
         for file in files:
             if not file:
-                return jsonify({'message': 'no files in vault'})
+                return make_response('No content', 204)
 
         return files
 
@@ -32,10 +32,10 @@ class FileService:
         file = File.query.filter_by(file_id=id).first()
 
         if not file:
-            return jsonify({'message': 'no such file'})
+            return make_response('No content', 204)
 
         if file not in current_user.files:
-            return jsonify({'message': 'permission denied'})
+            return make_response('Forbidden', 403)
         return file
 
     @staticmethod
@@ -45,10 +45,10 @@ class FileService:
         vault = Vault.query.filter_by(vault_id=vault_id).first()
 
         if not vault:
-            return jsonify({'message': 'no such vault'})
+            return make_response('No content', 204)
 
         if vault not in current_user.vaults:
-            return jsonify({"message": "permission denied"})
+            return make_response('Forbidden', 403)
 
         new_file = File(name=data['name'],
                         description=data['description'],
@@ -68,7 +68,10 @@ class FileService:
         file = File.query.filter_by(file_id=id).first()
 
         if not current_user.id == file.owner_id:
-            return jsonify({"message": "permission denied"})
+            return make_response('Forbidden', 403)
+
+        if not data:
+            return make_response('No content', 204)
 
         if 'description' in data:
             file.description = data['description']
@@ -78,7 +81,7 @@ class FileService:
 
         dbsession.commit()
 
-        return jsonify({"message": "file updated"})
+        return make_response('Updated', 200)
 
     @staticmethod
     @token_required
@@ -87,7 +90,10 @@ class FileService:
         file = File.query.filter_by(file_id=id).first()
 
         if not current_user.id == file.owner_id:
-            return jsonify({"message": "permission denied"})
+            return make_response('Forbidden', 403)
+
+        if not file:
+            return make_response('No content', 204)
 
         dbsession.delete(file)
         dbsession.commit()
@@ -95,4 +101,4 @@ class FileService:
         if file.data:
             os.remove(file.data)
 
-        return jsonify({'message': 'file has been deleted'})
+        return make_response('Deleted', 200)

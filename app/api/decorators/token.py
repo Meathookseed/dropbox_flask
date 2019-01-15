@@ -11,12 +11,14 @@ def token_required(f):
 
     @wraps(f)
     def decorated(*args, **kwargs):
+
         token = None
 
         if 'Bearer' in request.headers:
             token = request.headers['Bearer']
         elif 'Bearer' in request.args:
             token = request.args.get('Bearer')
+
         if not token:
             return jsonify({'message': 'Token is missing'})
 

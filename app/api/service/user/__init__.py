@@ -3,7 +3,7 @@ from app.api.decorators.token import token_required
 from app.models.models import User
 from app.shortcuts import dbsession
 
-from flask import jsonify, current_app, Response
+from flask import jsonify, current_app, make_response, Response
 
 from sqlalchemy.orm import Query
 
@@ -11,9 +11,7 @@ import uuid
 
 import jwt
 
-
 from werkzeug.security import generate_password_hash
-
 
 
 class UserService:
@@ -26,12 +24,12 @@ class UserService:
     def list(current_user: User) -> Query:
 
         if not current_user.admin and not current_user:
-            return jsonify({'message': 'permission denied'})
+            return make_response('Forbidden', 403)
 
         users = User.query.all()
 
         if not users:
-            return jsonify({'message': "there is no users yet"})
+            return make_response('No content', 204)
 
         return users
 
@@ -40,17 +38,20 @@ class UserService:
     def one(current_user: User, id: int) -> Query:
 
         if not current_user.id == id and not current_user.admin:
-            return jsonify({'message': 'permission denied'})
+            return make_response('Forbidden', 403)
 
         user = User.query.filter_by(id=int(id)).first()
 
         if not user:
-            return jsonify({'message': "there is no users"})
+            return make_response('No content', 204)
 
         return user
 
     @staticmethod
     def create(data: dict) -> Response:
+
+        if not data:
+            return make_response('No content', 204)
 
         hashed_password = generate_password_hash(data['password'])
 
@@ -69,6 +70,7 @@ class UserService:
                         )
         dbsession.add(new_user)
         dbsession.commit()
+
         import tasks
         tasks.send_email.delay(inner_json)
 
@@ -81,13 +83,16 @@ class UserService:
     @token_required
     def update(current_user: User, data=None, id=0) -> Response:
 
+        if not data:
+            return make_response('No content', 204)
+
         if not current_user.id == id and not current_user.admin:
-            return jsonify({"message": "permission denied"})
+            return make_response('Forbidden', 403)
 
         user = User.query.filter_by(id=int(id)).first()
 
         if not user:
-            return jsonify({'message': "there is no user"})
+            return make_response('No content', 204)
 
         if 'admin' in data:
             user.admin = data['admin']
@@ -103,21 +108,22 @@ class UserService:
 
         dbsession.commit()
 
-        return jsonify({'message': 'user updated'})
+        return make_response('Updated', 200)
 
     @staticmethod
     @token_required
     def delete(current_user: User, id: int) -> Response:
 
         if not current_user.id == int(id) and not current_user.admin:
-            return jsonify({'message': "permission denied"})
+            return make_response('Forbidden', 403)
 
         user = User.query.filter_by(id=int(id)).first()
 
         if not user:
-            return jsonify({'message': "there is no user"})
+            return make_response('No content', 204)
+
         dbsession.delete(user)
 
         dbsession.commit()
 
-        return jsonify({'message': 'user was deleted'})
+        return make_response('Deleted', 200)

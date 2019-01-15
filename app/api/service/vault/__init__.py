@@ -2,7 +2,7 @@ from app.api.decorators.token import token_required
 from app.models.models import Vault, User
 from app.shortcuts import dbsession
 
-from flask import jsonify, Response
+from flask import jsonify, make_response, Response
 from sqlalchemy.orm import Query
 
 
@@ -13,12 +13,12 @@ class VaultService:
     def list(current_user: User, id: int) -> Query:
 
         if not current_user.id == int(id):
-            return jsonify({'message': 'permission denied'})
+            return make_response('Forbidden', 403)
 
         vaults = Vault.query.filter_by(owner_id=current_user.id)
 
         if not vaults:
-            return jsonify({'message': 'there is no vaults'})
+            return make_response('No content', 204)
 
         return vaults
 
@@ -29,31 +29,31 @@ class VaultService:
         vault = Vault.query.filter_by(vault_id=int(id)).first()
 
         if vault not in current_user.vaults:
-            return jsonify({'message': 'permission denied'})
+            return make_response('Forbidden', 403)
 
         if not vault:
-            return jsonify({"message": 'no vault'})
+            return make_response('No content', 204)
 
         return vault
 
     @staticmethod
     @token_required
-    def create(current_user: User, data=None, id=0) -> Response:
+    def create(current_user: User, id=0, data=None) -> Response:
 
         if not current_user.id == int(id):
-            return jsonify({'message': 'permission denied'})
+            return make_response('Forbidden', 403)
 
         if not data:
-            return jsonify({'message': 'empty'})
+            return make_response('No content', 204)
 
         new_vault = Vault(description=data['description'],
                           title=data['title'],
-                          owner_id=id)
+                          owner_id=current_user.id)
 
         dbsession.add(new_vault)
         dbsession.commit()
 
-        return jsonify({'message': 'vault created'})
+        return make_response('Created', 200)
 
     @staticmethod
     @token_required
@@ -61,8 +61,11 @@ class VaultService:
 
         vault = Vault.query.filter_by(id=id).first()
 
+        if not vault:
+            return make_response('No content', 204)
+
         if vault not in current_user.vaults:
-            return jsonify({'message': 'permission denied'})
+            return make_response('Forbidden', 403)
 
         if 'description' in data:
             vault.description = data['description']
@@ -72,17 +75,21 @@ class VaultService:
 
         dbsession.commit()
 
-        return jsonify({'message': 'vault updated'})
+        return make_response('Updated', 200)
 
     @staticmethod
     @token_required
     def delete(current_user: User, id: int) -> Response:
 
         vault = Vault.query.filter_by(vault_id=id).first()
+
+        if not vault:
+            return make_response('No content', 204)
+
         if vault not in current_user.vaults:
-            return jsonify({'message': 'permission denied'})
+            return make_response('Forbidden', 403)
 
         dbsession.delete(vault)
         dbsession.commit()
 
-        return jsonify({'message': 'vault has been deleted'})
+        return make_response('Deleted', 200)

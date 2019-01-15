@@ -2,27 +2,25 @@ from app.api.decorators.token import token_required
 from app.models.models import User
 from app.shortcuts import dbsession
 
-from flask import jsonify, current_app, Response, Request
+from flask import jsonify, current_app, make_response, Response
 
 import os
 
 from werkzeug.utils import secure_filename
+from werkzeug.local import LocalProxy
 
 
 class PhotoService:
 
     @staticmethod
     @token_required
-    def create(current_user: User, photo: Request, id: int) -> Response:
+    def create(current_user: User, photo: LocalProxy, id: int) -> Response:
 
-        try:
+        if not current_user.id == id:
+            return make_response('Forbidden', 403)
 
-            if not current_user.id == id:
-                return jsonify({"message": "permission denied"})
-
-        except AttributeError:
-
-            return jsonify({'error': 'not logged in'})
+        if not photo:
+            return make_response('No content', 204)
 
         filename = secure_filename(photo.filename)
 
@@ -36,4 +34,4 @@ class PhotoService:
 
         dbsession.commit()
 
-        return jsonify({'message': 'photo uploaded'})
+        return make_response('Updated', 200)

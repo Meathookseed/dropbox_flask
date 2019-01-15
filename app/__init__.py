@@ -33,7 +33,9 @@ def create_app(config_file):
         if not database_exists(db_url):
             create_database(db_url)
 
-    elif os.environ.get('FLASK_ENV') == 'development' and app.config['TESTING'] is False:
+    elif os.environ.get('FLASK_ENV') == 'development' and app.config['TESTING'] is False \
+            or os.environ.get('FLASK_ENV') is None:
+
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///flask_dropbox'
         if not database_exists(app.config['SQLALCHEMY_DATABASE_URI']):
             create_database(app.config['SQLALCHEMY_DATABASE_URI'])
