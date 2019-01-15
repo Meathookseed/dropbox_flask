@@ -6,8 +6,8 @@ from app.api.service.auth import AuthService
 from app.api.service.user import UserService
 from app.extensions import db
 from app.shortcuts import dbsession
-from app.api.service.vault import VaultService
 
+import io
 
 class Test(TestCase):
 
@@ -77,11 +77,9 @@ class TestUser(Test):
 
         self.assertEqual(response.status_code, 200)
 
-        token = TestUser.create_not_admin_user()
-
         with self.app.test_client() as client:
 
-            response = client.get('/user/1/', headers={'Bearer': '{}'.format(token)})
+            response = client.get('/user/2/', headers={'Bearer': '{}'.format(token)})
 
         self.assertEqual(response.status_code, 403)
 
@@ -286,6 +284,103 @@ class TestVault(Test):
 
         # TODO Need to create 2 users with 2 vaults to check 403 error
 
+
+class TestPhoto(Test):
+
+    @staticmethod
+
+    def create_user():
+        data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
+        UserService.create(data=data)
+
+        response = AuthService.login({'username': 'test', 'password': 'test'})
+
+        token = json.loads(response.data)['token']
+
+        return token
+
+    def test_create_photo(self):
+
+        token = TestPhoto.create_user()
+
+        with self.app.test_client() as client:
+
+            data = dict()
+
+            data['photo'] = (io.BytesIO(b"abcdef"), 'test.jpg')
+
+            response = client.put('/photo/1/', headers={'Bearer': '{}'.format(token)},
+                                  data=data,
+                                  content_type='multipart/form-data')
+
+            self.assertEqual(response.status_code, 200)
+
+            data = dict()
+
+            data['photo'] = (io.BytesIO(b"abcdef"), 'test.jpg')
+
+            response = client.put('/photo/2/', headers={'Bearer': '{}'.format(token)},
+                                  data=data,
+                                  content_type='multipart/form-data')
+
+            self.assertEqual(response.status_code, 403)
+
+
+class TestLogin(Test):
+
+    @staticmethod
+    def create_user():
+        data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
+        UserService.create(data=data)
+
+    def test_login(self):
+        TestLogin.create_user()
+
+        with self.app.test_client() as client:
+
+            response = client.post('/login/', data=json.dumps({'username': 'test',
+                                                               'password': 'test'}),
+                                   content_type='application/json')
+
+            self.assertEqual(response.status_code, 200)
+
+            response = client.post('/login/', data=json.dumps({}),
+                                   content_type='application/json')
+
+            self.assertEqual(response.status_code, 401)
+
+            response = client.post('/login/', data=json.dumps({'username2': 'test',
+                                                               'password': 'test'}),
+                                   content_type='application/json')
+            self.assertEqual(response.status_code, 401)
+
+            response = client.post('/login/', data=json.dumps({'username': 'test2',
+                                                               'password': 'test2'}),
+                                   content_type='application/json')
+
+            self.assertEqual(response.status_code, 401)
+
+            response = client.post('/login/', data=json.dumps({'username': 'test',
+                                                               'password': 'test2'}),
+                                   content_type='application/json')
+            self.assertEqual(response.status_code, 401)
+
+
+class TestToken(Test):
+
+    def test_token(self):
+
+        with self.app.test_client() as client:
+
+            response = client.get('/user/')
+
+            self.assertEqual(response.status_code, 401)
+
+            token = TestUser.create_admin_user()
+
+            response = client.get('/user/?Bearer={}'.format(token))
+
+            self.assertEqual(response.status_code, 200)
 
 if __name__ == '__main__':
     unittest.main()

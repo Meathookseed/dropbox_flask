@@ -2,7 +2,7 @@ from app.api.decorators.token import token_required
 from app.models.models import Vault, User
 from app.shortcuts import dbsession
 
-from flask import jsonify, make_response, Response
+from flask import make_response, Response
 from sqlalchemy.orm import Query
 
 

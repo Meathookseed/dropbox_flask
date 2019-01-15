@@ -2,7 +2,7 @@ from app.api.decorators.token import token_required
 from app.models.models import User
 from app.shortcuts import dbsession
 
-from flask import jsonify, current_app, make_response, Response
+from flask import current_app, make_response, Response
 
 import os
 
@@ -18,9 +18,6 @@ class PhotoService:
 
         if not current_user.id == id:
             return make_response('Forbidden', 403)
-
-        if not photo:
-            return make_response('No content', 204)
 
         filename = secure_filename(photo.filename)
 

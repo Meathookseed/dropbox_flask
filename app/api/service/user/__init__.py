@@ -30,8 +30,7 @@ class UserService:
     @staticmethod
     @token_required
     def one(current_user: User, id: int) -> Query:
-
-        if not current_user.id == id and not current_user.admin:
+        if not current_user.id == int(id):
             return make_response('Forbidden', 403)
 
         user = User.query.filter_by(id=int(id)).first()
@@ -43,6 +42,11 @@ class UserService:
 
         if not data:
             return make_response('No content', 204)
+
+        try:
+            data['admin']
+        except KeyError:
+            data['admin'] = True
 
         hashed_password = generate_password_hash(data['password'])
 

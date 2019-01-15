@@ -7,6 +7,8 @@ from flask_classful import FlaskView, route
 
 from flask_apispec.annotations import marshal_with, doc
 
+from flask_sqlalchemy import BaseQuery
+
 
 class VaultView(FlaskView):
 
@@ -18,10 +20,11 @@ class VaultView(FlaskView):
 
         response = VaultService.list(id=id)
 
-        if not isinstance(response, list):
+        if not isinstance(response, BaseQuery):
             return response
 
         schema = VaultSchema(many=True)
+
         output = schema.dump(response).data
 
         return jsonify({'vaults': output})

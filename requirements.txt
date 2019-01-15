@@ -11,6 +11,7 @@ chardet==3.0.4
 Click==7.0
 clickclick==1.2.2
 connexion==2.0.2
+coverage==4.5.2
 cryptography==2.4.2
 dnspython==1.16.0
 eventlet==0.24.1
