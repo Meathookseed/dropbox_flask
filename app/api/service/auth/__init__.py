@@ -22,7 +22,7 @@ class AuthService:
         user = User.query.filter_by(username=data['username']).first()
 
         if not user:
-            return make_response('Could not verify', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
+            return make_response('Could not verify2', 401, {"WWW-AUTHENTICATE": "Bearer realm = no token "})
 
         if check_password_hash(user.password, data['password']):
             token = jwt.encode({'public_id': user.public_id},

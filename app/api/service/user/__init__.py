@@ -16,20 +16,14 @@ from werkzeug.security import generate_password_hash
 
 class UserService:
 
-    def __init__(self):
-        self.name = 'users'
-
     @staticmethod
     @token_required
     def list(current_user: User) -> Query:
 
-        if not current_user.admin and not current_user:
+        if not current_user.admin:
             return make_response('Forbidden', 403)
 
         users = User.query.all()
-
-        if not users:
-            return make_response('No content', 204)
 
         return users
 
@@ -41,9 +35,6 @@ class UserService:
             return make_response('Forbidden', 403)
 
         user = User.query.filter_by(id=int(id)).first()
-
-        if not user:
-            return make_response('No content', 204)
 
         return user
 
@@ -58,7 +49,7 @@ class UserService:
         inner_json = {
             'username': data['username'],
             'password': hashed_password,
-            'admin': True,
+            'admin': data['admin'],
             'email':  data['email'],
 
         }
@@ -91,9 +82,6 @@ class UserService:
 
         user = User.query.filter_by(id=int(id)).first()
 
-        if not user:
-            return make_response('No content', 204)
-
         if 'admin' in data:
             user.admin = data['admin']
 
@@ -118,9 +106,6 @@ class UserService:
             return make_response('Forbidden', 403)
 
         user = User.query.filter_by(id=int(id)).first()
-
-        if not user:
-            return make_response('No content', 204)
 
         dbsession.delete(user)
 
