@@ -16,10 +16,6 @@ class VaultService:
             return make_response('Forbidden', 403)
 
         vaults = Vault.query.filter_by(owner_id=current_user.id)
-
-        if not vaults:
-            return make_response('No content', 204)
-
         return vaults
 
     @staticmethod
@@ -30,9 +26,6 @@ class VaultService:
 
         if vault not in current_user.vaults:
             return make_response('Forbidden', 403)
-
-        if not vault:
-            return make_response('No content', 204)
 
         return vault
 
@@ -57,9 +50,9 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def update(data: dict, current_user: User, id: int) -> Response:
+    def update(current_user: User, data: dict, id: int) -> Response:
 
-        vault = Vault.query.filter_by(id=id).first()
+        vault = Vault.query.filter_by(vault_id=id).first()
 
         if not vault:
             return make_response('No content', 204)

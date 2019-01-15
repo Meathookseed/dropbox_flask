@@ -1,6 +1,6 @@
 from app.api.service.vault import VaultService
 from app.api.serializers.vault import VaultSchema
-
+from app.models.models import Vault
 from flask import request, jsonify
 
 from flask_classful import FlaskView, route
@@ -16,10 +16,13 @@ class VaultView(FlaskView):
     def index(self, id: int):
         """List of users"""
 
-        vaults = VaultService.list(id=id)
+        response = VaultService.list(id=id)
+
+        if not isinstance(response, list):
+            return response
 
         schema = VaultSchema(many=True)
-        output = schema.dump(vaults).data
+        output = schema.dump(response).data
 
         return jsonify({'vaults': output})
 
@@ -27,7 +30,11 @@ class VaultView(FlaskView):
     @doc(description='Retrieve one vault, <id> - vault prop')
     def get(self, id: int):
         """Retrieve one user"""
+
         vault = VaultService.one(id=id)
+
+        if not isinstance(vault, Vault):
+            return vault
 
         schema = VaultSchema()
 
