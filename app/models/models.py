@@ -28,4 +28,4 @@ class File(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     name = db.Column(db.String(100))
     description = db.Column(db.String())
-    data = db.Column(db.String())
+    data = db.Column(db.String(), unique=True)

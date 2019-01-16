@@ -9,6 +9,7 @@ from app.shortcuts import dbsession
 
 import io
 
+
 class Test(TestCase):
 
     def create_app(self):
@@ -75,13 +76,13 @@ class TestUser(Test):
 
             response = client.get('/user/1/', headers={'Bearer': '{}'.format(token)})
 
-        self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
         with self.app.test_client() as client:
 
             response = client.get('/user/2/', headers={'Bearer': '{}'.format(token)})
 
-        self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 403)
 
     def test_user_delete(self):
 
@@ -89,6 +90,7 @@ class TestUser(Test):
 
         with self.app.test_client() as client:
             response = client.delete('/user/1/', headers={'Bearer': '{}'.format(token)})
+
             self.assertEqual(response.status_code, 200)
 
         token = TestUser.create_not_admin_user()
@@ -96,7 +98,7 @@ class TestUser(Test):
         with self.app.test_client() as client:
             response = client.delete('/user/1/', headers={'Bearer': '{}'.format(token)})
 
-        self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 403)
 
     def test_user_update(self):
 
@@ -111,12 +113,12 @@ class TestUser(Test):
                                                      "admin": False}),
                                     content_type='application/json')
 
-        self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
         with self.app.test_client() as client:
             response = client.patch('/user/1/', headers={'Bearer': '{}'.format(token)})
 
-        self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 204)
 
         token = TestUser.create_not_admin_user()
 
@@ -125,7 +127,7 @@ class TestUser(Test):
                                     data=json.dumps({"username": "updated"}),
                                     content_type='application/json')
 
-        self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 403)
 
     def test_user_create(self):
 
@@ -136,12 +138,12 @@ class TestUser(Test):
                                                                       "admin": True}),
                                    content_type='application/json')
 
-        self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
         with self.app.test_client() as client:
             response = client.post('/registration/',)
 
-        self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 204)
 
 
 class TestVault(Test):
@@ -185,7 +187,7 @@ class TestVault(Test):
 
             response = client.post('/vault/1/', headers={'Bearer': "{}".format(token)})
 
-        self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 204)
 
         with self.app.test_client() as client:
 
@@ -193,7 +195,7 @@ class TestVault(Test):
                                    data=json.dumps({'title': 'test', 'description': 'test'}),
                                    content_type='application/json')
 
-        self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
         with self.app.test_client() as client:
 
@@ -201,7 +203,7 @@ class TestVault(Test):
                                    data=json.dumps({'title': 'test', 'description': 'test'}),
                                    content_type='application/json')
 
-        self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 403)
 
     def test_vault_list(self):
 
@@ -272,7 +274,7 @@ class TestVault(Test):
 
             response = client.delete('/vault/1/', headers={'Bearer': '{}'.format(token)})
 
-        self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
         token = TestVault.create_user()
 
@@ -280,7 +282,7 @@ class TestVault(Test):
 
             response = client.delete('/vault/1/', headers={'Bearer': '{}'.format(token)})
 
-        self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 204)
 
         # TODO Need to create 2 users with 2 vaults to check 403 error
 
@@ -288,7 +290,6 @@ class TestVault(Test):
 class TestPhoto(Test):
 
     @staticmethod
-
     def create_user():
         data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
         UserService.create(data=data)
@@ -381,6 +382,7 @@ class TestToken(Test):
             response = client.get('/user/?Bearer={}'.format(token))
 
             self.assertEqual(response.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()

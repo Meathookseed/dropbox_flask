@@ -20,7 +20,7 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def one(current_user: User, id: int) -> Query:
+    def one(current_user: User, id=0) -> Query:
 
         vault = Vault.query.filter_by(vault_id=int(id)).first()
 

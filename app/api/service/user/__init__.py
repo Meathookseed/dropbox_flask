@@ -1,5 +1,5 @@
 from app.api.decorators.token import token_required
-
+from app.exceptions import UniqueUserAttributes
 from app.models.models import User
 from app.shortcuts import dbsession
 
@@ -29,7 +29,9 @@ class UserService:
 
     @staticmethod
     @token_required
-    def one(current_user: User, id: int) -> Query:
+    def one(current_user: User, id:int) -> Query:
+        print(current_user)
+        print(current_user.id)
         if not current_user.id == int(id):
             return make_response('Forbidden', 403)
 
@@ -57,14 +59,18 @@ class UserService:
             'email':  data['email'],
 
         }
-        new_user = User(public_id=str(uuid.uuid4()),
-                        username=inner_json['username'],
-                        password=inner_json['password'],
-                        admin=inner_json['admin'],
-                        email=inner_json['email'],
-                        )
-        dbsession.add(new_user)
-        dbsession.commit()
+        try:
+            new_user = User(public_id=str(uuid.uuid4()),
+                            username=inner_json['username'],
+                            password=inner_json['password'],
+                            admin=inner_json['admin'],
+                            email=inner_json['email'],
+                            )
+            dbsession.add(new_user)
+            dbsession.commit()
+
+        except Exception:
+            raise UniqueUserAttributes
 
         import tasks
         tasks.send_email.delay(inner_json)
