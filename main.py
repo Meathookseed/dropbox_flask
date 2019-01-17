@@ -13,7 +13,6 @@ app, socket = create_app(config_file='config.yaml')
 def __handle_vault_events(json: dict):
 
     user = UserService.one(json['id'])
-    print(user.__dict__)
     emit('vault_state', UserSchema().dump(user).data)
 
 
