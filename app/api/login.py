@@ -1,5 +1,4 @@
-from app.api.service.auth import AuthService
-
+from app.api.service import AuthService
 from flask import request
 
 from flask_apispec.annotations import doc

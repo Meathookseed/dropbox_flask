@@ -1,10 +1,9 @@
 from flask_socketio import emit
 
 from app import create_app
-from app.api.serializers.user import UserSchema
-from app.api.serializers.vault import VaultSchema
-from app.api.service.user import UserService
-from app.api.service.vault import VaultService
+from app.api.serializers import UserSchema, VaultSchema
+from app.api.service import UserService, VaultService
+
 
 app, socket = create_app(config_file='config.yaml')
 

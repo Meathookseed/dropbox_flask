@@ -1,4 +1,4 @@
-from app.api.service.user import UserService
+from app.api.service import UserService
 
 from flask import request
 

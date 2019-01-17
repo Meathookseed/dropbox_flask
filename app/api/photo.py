@@ -1,5 +1,4 @@
-from app.api.service.photo import PhotoService
-
+from app.api.service import PhotoService
 from flask import request
 
 from flask_classful import FlaskView

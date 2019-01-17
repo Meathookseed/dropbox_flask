@@ -1,5 +1,5 @@
-from app.api.service.user import UserService
-from app.api.serializers.user import UserSchema
+from app.api.service import UserService
+from app.api.serializers import UserSchema
 from app.models.models import User
 from flask import request, jsonify
 from flask_classful import FlaskView, route

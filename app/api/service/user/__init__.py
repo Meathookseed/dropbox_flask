@@ -32,7 +32,7 @@ class UserService:
     def one(current_user: User, id:int, *args) -> Query:
 
         if not current_user.id == int(id):
-            print('forbidden')
+
             return make_response('Forbidden', 403)
 
         user = User.query.filter_by(id=int(id)).first()

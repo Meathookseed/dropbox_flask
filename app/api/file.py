@@ -1,7 +1,7 @@
 from flask_classful import FlaskView, route
 
-from app.api.service.file import FileService
-from app.api.serializers.file import FileSchema
+from app.api.service import FileService
+from app.api.serializers import FileSchema
 
 from flask import request, jsonify
 

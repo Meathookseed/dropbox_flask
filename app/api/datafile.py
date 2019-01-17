@@ -1,4 +1,4 @@
-from app.api.service.datafile import DataFileService
+from app.api.service import DataFileService
 
 from flask import request
 

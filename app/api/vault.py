@@ -1,5 +1,5 @@
-from app.api.service.vault import VaultService
-from app.api.serializers.vault import VaultSchema
+from app.api.service import VaultService
+from app.api.serializers import VaultSchema
 from app.models.models import Vault
 from flask import request, jsonify
 
