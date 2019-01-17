@@ -20,7 +20,7 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def one(current_user: User, id=0) -> Query:
+    def one(current_user: User, id:int, *args) -> Query:
 
         vault = Vault.query.filter_by(vault_id=int(id)).first()
 
@@ -31,7 +31,7 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def create(current_user: User, id=0, data=None) -> Response:
+    def create(current_user: User, id=0, data=None, *args) -> Response:
 
         if not current_user.id == int(id):
             return make_response('Forbidden', 403)

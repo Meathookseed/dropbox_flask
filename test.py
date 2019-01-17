@@ -248,7 +248,6 @@ class TestVault(Test):
 
             self.assertEqual(response.status_code, 200)
 
-        # TODO Need to create 2 users with 2 vaults to check 403 error
         # with self.app.test_client() as client:
         #
         #     response = client.patch('/vault/2/', headers={'Bearer': "{}".format(token)},
