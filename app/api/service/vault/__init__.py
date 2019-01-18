@@ -38,8 +38,7 @@ class VaultService:
 
         if not data:
             return make_response('No content', 204)
-        print('created')
-        print(data)
+
         new_vault = Vault(description=data['description'],
                           title=data['title'],
                           owner_id=current_user.id)
@@ -76,7 +75,7 @@ class VaultService:
     def delete(current_user: User, id: int) -> Response:
 
         vault = Vault.query.filter_by(vault_id=id).first()
-        print('deleted')
+
         if not vault:
             return make_response('No content', 204)
 

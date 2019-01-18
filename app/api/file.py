@@ -1,5 +1,5 @@
 from flask_classful import FlaskView, route
-
+from app.models.models import File
 from app.api.service import FileService
 from app.api.serializers import FileSchema
 
@@ -7,19 +7,24 @@ from flask import request, jsonify
 
 from flask_apispec.annotations import marshal_with, doc
 
+from flask_sqlalchemy import BaseQuery
+
 
 class FileView(FlaskView):
 
-    @route('vault_<vault_id>',)
+    @route('vault_<vault_id>/',)
     @marshal_with(FileSchema(many=True))
     @doc(description='Get List of all files, <vault_id> - vault prop')
     def index(self, vault_id: int):
         """List of files"""
-        files = FileService.list(vault_id=vault_id)
+        response = FileService.list(vault_id=vault_id)
+
+        if not isinstance(response, BaseQuery):
+            return response
 
         file_schema = FileSchema(many=True)
 
-        output = file_schema.dump(files).data
+        output = file_schema.dump(response).data
 
         return jsonify({'files': output})
 
@@ -27,7 +32,11 @@ class FileView(FlaskView):
     @doc(description='Retrieve one file, <id> - file prop')
     def get(self, id: int):
         """Retrieve one user"""
-        file = FileService.one(id=id)
+
+        file = FileService.one(id)
+
+        if not isinstance(file, File):
+            return file
 
         file_schema = FileSchema()
 
@@ -40,7 +49,8 @@ class FileView(FlaskView):
         """Create User"""
 
         data = request.get_json()
-        return FileService.create(data=data, vault_id=vault_id)
+
+        return FileService.create(vault_id, data)
 
     @doc(description='Updates file, <id> - file prop')
     def patch(self, id: int):

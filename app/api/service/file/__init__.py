@@ -19,10 +19,6 @@ class FileService:
         if vault not in current_user.vaults:
             return make_response('Forbidden', 403)
 
-        for file in files:
-            if not file:
-                return make_response('No content', 204)
-
         return files
 
     @staticmethod
@@ -31,11 +27,9 @@ class FileService:
 
         file = File.query.filter_by(file_id=id).first()
 
-        if not file:
-            return make_response('No content', 204)
-
         if file not in current_user.files:
             return make_response('Forbidden', 403)
+
         return file
 
     @staticmethod
@@ -43,9 +37,6 @@ class FileService:
     def create(current_user: User, vault_id: int, data: dict) -> Response:
 
         vault = Vault.query.filter_by(vault_id=vault_id).first()
-
-        if not vault:
-            return make_response('No content', 204)
 
         if vault not in current_user.vaults:
             return make_response('Forbidden', 403)
@@ -67,11 +58,8 @@ class FileService:
 
         file = File.query.filter_by(file_id=id).first()
 
-        if not current_user.id == file.owner_id:
+        if not file or not current_user.id == file.owner_id:
             return make_response('Forbidden', 403)
-
-        if not data:
-            return make_response('No content', 204)
 
         if 'description' in data:
             file.description = data['description']
@@ -89,11 +77,8 @@ class FileService:
 
         file = File.query.filter_by(file_id=id).first()
 
-        if not current_user.id == file.owner_id:
+        if not file or not current_user.id == file.owner_id:
             return make_response('Forbidden', 403)
-
-        if not file:
-            return make_response('No content', 204)
 
         dbsession.delete(file)
         dbsession.commit()

@@ -382,5 +382,124 @@ class TestToken(Test):
             self.assertEqual(response.status_code, 200)
 
 
+class TestFile(Test):
+
+    @staticmethod
+    def fixture():
+        data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
+        UserService.create(data=data)
+
+        response = AuthService.login({'username': 'test', 'password': 'test'})
+
+        token = json.loads(response.data)['token']
+
+        app = Test().create_app()
+
+        with app.test_client() as client:
+
+            client.post('/vault/1/', headers={'Bearer': "{}".format(token)},
+                        data=json.dumps({'title': 'test', 'description': 'test'}),
+                        content_type='application/json')
+
+            client.post('/file/1/', headers={'Bearer': '{}'.format(token)},
+                        data=json.dumps({"name": "first file", "description": "fixture"}),
+                        content_type='application/json')
+
+        return token
+
+    @staticmethod
+    def fixture_without_file_create():
+        data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
+        UserService.create(data=data)
+
+        response = AuthService.login({'username': 'test', 'password': 'test'})
+
+        token = json.loads(response.data)['token']
+
+        app = Test().create_app()
+
+        with app.test_client() as client:
+            client.post('/vault/1/', headers={'Bearer': "{}".format(token)},
+                        data=json.dumps({'title': 'test', 'description': 'test'}),
+                        content_type='application/json')
+
+        return token
+
+    def test_file_create(self):
+
+        token = TestFile.fixture_without_file_create()
+
+        with self.app.test_client() as client:
+
+            response = client.post('/file/1/', headers={'Bearer': '{}'.format(token)},
+                                   data=json.dumps({"name": "first file", "description": "fixture"}),
+                                   content_type='application/json')
+            self.assertEqual(response.status_code, 200)
+
+            response = client.post('/file/2/',headers={'Bearer': '{}'.format(token)},
+                                   data=json.dumps({"name": "first file", "description": "fixture"}),
+                                   content_type='application/json')
+
+            self.assertEqual(response.status_code, 403)
+
+    def test_file_list(self):
+
+        token = TestFile.fixture()
+
+        with self.app.test_client() as client:
+
+            response = client.get('/file/vault_1/', headers={"Bearer": "{}".format(token)})
+
+            self.assertEqual(response.status_code, 200)
+
+            response = client.get('/file/vault_2/', headers={"Bearer": "{}".format(token)})
+
+            self.assertEqual(response.status_code, 403)
+
+    def test_file_retrieve(self):
+
+        token = TestFile.fixture()
+
+        with self.app.test_client() as client:
+
+            response = client.get('/file/1/', headers={"Bearer": "{}".format(token)})
+
+            self.assertEqual(response.status_code, 200)
+
+            response = client.get('/file/2/', headers={"Bearer": "{}".format(token)})
+
+            self.assertEqual(response.status_code, 403)
+
+    def test_file_update(self):
+
+        token = TestFile.fixture()
+
+        with self.app.test_client() as client:
+
+            response = client.patch('/file/1/', headers={'Bearer': "{}".format(token)},
+                                    data=json.dumps({"name": "updated", "description": "updated"}),
+                                    content_type='application/json')
+            self.assertEqual(response.status_code, 200)
+
+            response = client.patch('/file/2/', headers={'Bearer': "{}".format(token)},
+                                    data=json.dumps({"name": "updated", "description": "updated"}),
+                                    content_type='application/json')
+
+            self.assertEqual(response.status_code, 403)
+
+    def test_file_delete(self):
+        token = TestFile.fixture()
+
+        with self.app.test_client() as client:
+
+            response = client.delete('/file/1/', headers={'Bearer': "{}".format(token)})
+
+            self.assertEqual(response.status_code, 200)
+
+            response = client.delete('/file/2/', headers={'Bearer': "{}".format(token)})
+
+            self.assertEqual(response.status_code, 403)
+
+
 if __name__ == '__main__':
     unittest.main()
