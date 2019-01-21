@@ -10,11 +10,11 @@ class FileService:
 
     @staticmethod
     @token_required
-    def list(current_user: User, vault_id: int)-> Query:
+    def list(current_user: User, **kwargs)-> Query:
 
-        files = File.query.filter_by(vault_id=vault_id)
+        files = File.query.filter_by(vault_id=kwargs['vault_id'])
 
-        vault = Vault.query.filter_by(vault_id=vault_id).first()
+        vault = Vault.query.filter_by(vault_id=kwargs['vault_id']).first()
 
         if vault not in current_user.vaults:
             return make_response('Forbidden', 403)
@@ -23,9 +23,9 @@ class FileService:
 
     @staticmethod
     @token_required
-    def one(current_user: User, id: int) -> Query:
+    def one(current_user: User, **kwargs) -> Query:
 
-        file = File.query.filter_by(file_id=id).first()
+        file = File.query.filter_by(file_id=kwargs['id']).first()
 
         if file not in current_user.files:
             return make_response('Forbidden', 403)
@@ -34,16 +34,18 @@ class FileService:
 
     @staticmethod
     @token_required
-    def create(current_user: User, vault_id: int, data: dict) -> Response:
+    def create(current_user: User, **kwargs) -> Response:
 
-        vault = Vault.query.filter_by(vault_id=vault_id).first()
+        vault = Vault.query.filter_by(vault_id=kwargs['vault_id']).first()
 
         if vault not in current_user.vaults:
             return make_response('Forbidden', 403)
 
+        data = kwargs['data']
+
         new_file = File(name=data['name'],
                         description=data['description'],
-                        vault_id=vault_id,
+                        vault_id=kwargs['vault_id'],
                         owner_id=vault.owner_id)
 
         dbsession.add(new_file)
@@ -54,12 +56,14 @@ class FileService:
 
     @staticmethod
     @token_required
-    def update(current_user: User, data: dict, id: int) -> Response:
+    def update(current_user: User, **kwargs) -> Response:
 
-        file = File.query.filter_by(file_id=id).first()
+        file = File.query.filter_by(file_id=kwargs['id']).first()
 
         if not file or not current_user.id == file.owner_id:
             return make_response('Forbidden', 403)
+
+        data = kwargs['data']
 
         if 'description' in data:
             file.description = data['description']
@@ -73,9 +77,9 @@ class FileService:
 
     @staticmethod
     @token_required
-    def delete(current_user: User, id: int) -> Response:
+    def delete(current_user: User, **kwargs) -> Response:
 
-        file = File.query.filter_by(file_id=id).first()
+        file = File.query.filter_by(file_id=kwargs['id']).first()
 
         if not file or not current_user.id == file.owner_id:
             return make_response('Forbidden', 403)

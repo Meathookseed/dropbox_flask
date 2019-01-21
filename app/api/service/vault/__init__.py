@@ -10,9 +10,9 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def list(current_user: User, id: int) -> Query:
+    def list(current_user: User, **kwargs) -> Query:
 
-        if not current_user.id == int(id):
+        if not current_user.id == int(kwargs['id']):
             return make_response('Forbidden', 403)
 
         vaults = Vault.query.filter_by(owner_id=current_user.id)
@@ -31,10 +31,12 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def create(current_user: User, id=0, data=None, *args) -> Response:
+    def create(current_user: User, **kwargs) -> Response:
 
-        if not current_user.id == int(id):
+        if not current_user.id == int(kwargs['id']):
             return make_response('Forbidden', 403)
+
+        data = kwargs['data']
 
         if not data:
             return make_response('No content', 204)
@@ -50,12 +52,14 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def update(current_user: User, data: dict, id: int) -> Response:
+    def update(current_user: User, **kwargs) -> Response:
 
-        vault = Vault.query.filter_by(vault_id=id).first()
+        vault = Vault.query.filter_by(vault_id=kwargs['id']).first()
 
         if not vault or vault not in current_user.vaults:
             return make_response('Forbidden', 403)
+
+        data = kwargs['data']
 
         if 'description' in data:
             vault.description = data['description']
@@ -69,9 +73,9 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def delete(current_user: User, id: int) -> Response:
+    def delete(current_user: User, **kwargs) -> Response:
 
-        vault = Vault.query.filter_by(vault_id=id).first()
+        vault = Vault.query.filter_by(vault_id=kwargs['id']).first()
 
         if not vault or vault not in current_user.vaults:
             return make_response('Forbidden', 403)

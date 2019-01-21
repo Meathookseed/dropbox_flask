@@ -50,4 +50,4 @@ class UserView(FlaskView):
     @doc(description='Deletes user')
     def delete(self, id: int):
         """Delete User"""
-        return UserService.delete(id)
+        return UserService.delete(id=id)

@@ -40,7 +40,9 @@ class UserService:
         return user
 
     @staticmethod
-    def create(data: dict) -> Response:
+    def create(**kwargs) -> Response:
+
+        data = kwargs['data']
 
         if not data:
             return make_response('No content', 204)
@@ -82,15 +84,17 @@ class UserService:
 
     @staticmethod
     @token_required
-    def update(current_user: User, data=None, id=0) -> Response:
+    def update(current_user: User, **kwargs) -> Response:
 
-        if not data:
+        if not kwargs['data']:
             return make_response('No content', 204)
 
-        if not current_user.id == id and not current_user.admin:
+        if not current_user.id == kwargs['id'] and not current_user.admin:
             return make_response('Forbidden', 403)
 
-        user = User.query.filter_by(id=int(id)).first()
+        user = User.query.filter_by(id=int(kwargs['id'])).first()
+
+        data = kwargs['data']
 
         if 'admin' in data:
             user.admin = data['admin']
@@ -110,12 +114,12 @@ class UserService:
 
     @staticmethod
     @token_required
-    def delete(current_user: User, id: int) -> Response:
+    def delete(current_user: User, **kwargs) -> Response:
 
-        if not current_user.id == int(id) and not current_user.admin:
+        if not current_user.id == int(kwargs['id']) and not current_user.admin:
             return make_response('Forbidden', 403)
 
-        user = User.query.filter_by(id=int(id)).first()
+        user = User.query.filter_by(id=int(kwargs['id'])).first()
 
         dbsession.delete(user)
 

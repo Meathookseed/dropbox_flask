@@ -33,7 +33,7 @@ class FileView(FlaskView):
     def get(self, id: int):
         """Retrieve one user"""
 
-        file = FileService.one(id)
+        file = FileService.one(id=id)
 
         if not isinstance(file, File):
             return file
@@ -50,7 +50,7 @@ class FileView(FlaskView):
 
         data = request.get_json()
 
-        return FileService.create(vault_id, data)
+        return FileService.create(vault_id=vault_id, data=data)
 
     @doc(description='Updates file, <id> - file prop')
     def patch(self, id: int):

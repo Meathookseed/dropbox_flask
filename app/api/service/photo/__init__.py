@@ -14,10 +14,12 @@ class PhotoService:
 
     @staticmethod
     @token_required
-    def create(current_user: User, photo: LocalProxy, id: int) -> Response:
+    def create(current_user: User, **kwargs) -> Response:
 
-        if not current_user.id == id:
+        if not current_user.id == kwargs['id']:
             return make_response('Forbidden', 403)
+
+        photo = kwargs['photo']
 
         filename = secure_filename(photo.filename)
 
@@ -25,7 +27,7 @@ class PhotoService:
 
         photo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
 
-        user = User.query.filter_by(id=id).first()
+        user = User.query.filter_by(id=kwargs['id']).first()
 
         user.photo = file_folder
 

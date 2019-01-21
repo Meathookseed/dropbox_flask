@@ -13,12 +13,14 @@ class DataFileService:
 
     @staticmethod
     @token_required
-    def create(current_user: User, datafile: LocalProxy, id: int) -> Response:
+    def create(current_user: User, **kwargs) -> Response:
 
-        file = File.query.filter_by(file_id=id).first()
+        file = File.query.filter_by(file_id=kwargs['id']).first()
 
         if not file:
             file.data = None
+
+        datafile = kwargs['datafile']
 
         filename = secure_filename(datafile.filename)
 

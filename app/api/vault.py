@@ -55,9 +55,9 @@ class VaultView(FlaskView):
     def patch(self, id: int):
         """Update user"""
         data = request.get_json()
-        return VaultService.update(data, id=id)
+        return VaultService.update(data=data, id=id)
 
     @doc(description='Deletes vault, <id> - vault prop ')
     def delete(self, id: int):
         """Delete User"""
-        return VaultService.delete(id)
+        return VaultService.delete(id=id)
