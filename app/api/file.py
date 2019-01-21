@@ -5,12 +5,13 @@ from app.api.serializers import FileSchema
 
 from flask import request, jsonify
 
+from flask_apispec import ResourceMeta
 from flask_apispec.annotations import marshal_with, doc
 
 from flask_sqlalchemy import BaseQuery
 
 
-class FileView(FlaskView):
+class FileView(FlaskView, metaclass=ResourceMeta):
 
     @route('vault_<vault_id>/',)
     @marshal_with(FileSchema(many=True))
@@ -28,7 +29,7 @@ class FileView(FlaskView):
 
         return jsonify({'files': output})
 
-    @marshal_with(FileSchema)
+    @marshal_with(FileSchema())
     @doc(description='Retrieve one file, <id> - file prop')
     def get(self, id: int):
         """Retrieve one user"""

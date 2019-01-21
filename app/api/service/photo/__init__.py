@@ -7,7 +7,6 @@ from flask import current_app, make_response, Response
 import os
 
 from werkzeug.utils import secure_filename
-from werkzeug.local import LocalProxy
 
 
 class PhotoService:

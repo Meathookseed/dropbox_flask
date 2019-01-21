@@ -5,12 +5,13 @@ from flask import request, jsonify
 
 from flask_classful import FlaskView, route
 
+from flask_apispec import ResourceMeta
 from flask_apispec.annotations import marshal_with, doc
 
 from flask_sqlalchemy import BaseQuery
 
 
-class VaultView(FlaskView):
+class VaultView(FlaskView, metaclass=ResourceMeta):
 
     @route('user_<id>/')
     @marshal_with(VaultSchema(many=True))
@@ -29,7 +30,7 @@ class VaultView(FlaskView):
 
         return jsonify({'vaults': output})
 
-    @marshal_with(VaultSchema)
+    @marshal_with(VaultSchema())
     @doc(description='Retrieve one vault, <id> - vault prop')
     def get(self, id: int):
         """Retrieve one user"""

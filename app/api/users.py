@@ -3,16 +3,17 @@ from app.api.serializers import UserSchema
 from app.models.models import User
 from flask import request, jsonify
 from flask_classful import FlaskView, route
+from flask_apispec import ResourceMeta
 from flask_apispec.annotations import marshal_with, doc
 
 
-class UserView(FlaskView):
+@doc(description='All User Endpoints', tags=['user'])
+class UserView(FlaskView, metaclass=ResourceMeta):
 
-    @marshal_with(UserSchema(many=True))
-    @doc(description='Get List of all users')
+    @marshal_with(schema=UserSchema(many=True))
+    @doc(description='Get List of all users',inherit=None)
     def index(self):
-        """List of users"""
-
+        """Get list of all users."""
         response = UserService.list()
 
         if not isinstance(response, list):
@@ -24,11 +25,10 @@ class UserView(FlaskView):
 
         return jsonify({"users": user_result})
 
-    @route('<id>/')
-    @marshal_with(UserSchema)
+    @marshal_with(schema=UserSchema())
+    @doc(description='Retrieve one user')
     def get(self, id: int):
-        """Retrieve one user"""
-
+        """Retrieve one user."""
         response = UserService.one(id=id)
 
         if not isinstance(response, User):

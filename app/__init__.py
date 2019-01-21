@@ -45,18 +45,36 @@ def create_app(config_file):
 
     docs.init_app(app)
 
+    PhotoView.register(app, trailing_slash=True)
+    docs.register(PhotoView, endpoint='PhotoView:put')
+
     LoginView.register(app, trailing_slash=True)
+    docs.register(LoginView, endpoint='LoginView:post')
 
     RegistrationView.register(app, trailing_slash=True)
+    docs.register(RegistrationView, endpoint='RegistrationView:post')
 
     UserView.register(app, trailing_slash=True)
-
-    PhotoView.register(app, trailing_slash=True)
+    docs.register(UserView, endpoint='UserView:index')
+    docs.register(UserView, endpoint='UserView:get')
+    docs.register(UserView, endpoint='UserView:patch')
+    docs.register(UserView, endpoint='UserView:delete')
 
     FileView.register(app, trailing_slash=True)
+    docs.register(FileView, endpoint='FileView:index')
+    docs.register(FileView, endpoint='FileView:get')
+    docs.register(FileView, endpoint='FileView:post')
+    docs.register(FileView, endpoint='FileView:patch')
+    docs.register(FileView, endpoint='FileView:delete')
 
     VaultView.register(app, trailing_slash=True)
+    docs.register(VaultView, endpoint='VaultView:index')
+    docs.register(VaultView, endpoint='VaultView:get')
+    docs.register(VaultView, endpoint='VaultView:patch')
+    docs.register(VaultView, endpoint='VaultView:delete')
+    docs.register(VaultView, endpoint='VaultView:post')
 
     DataView.register(app, trailing_slash=True)
+    docs.register(DataView, endpoint='DataView:put')
 
     return app, socket

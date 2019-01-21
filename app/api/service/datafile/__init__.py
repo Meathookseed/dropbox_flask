@@ -2,11 +2,10 @@ from app.shortcuts import dbsession
 from app.api.decorators.token import token_required
 from app.models.models import File, User
 
-from flask import jsonify, current_app,make_response, Response
+from flask import jsonify, current_app, make_response, Response
 import os
 
 from werkzeug.utils import secure_filename
-from werkzeug.local import LocalProxy
 
 
 class DataFileService:
