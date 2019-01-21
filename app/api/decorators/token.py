@@ -17,11 +17,8 @@ def token_required(f):
         if 'Bearer' in request.headers:
             token = request.headers['Bearer']
 
-        if 'Bearer' in request.args:
-            token = request.args.get('Bearer')
-
-        # if len(args) >= 2:
-        #     token = args[1]
+        if 'token' in kwargs.keys():
+            token = kwargs['token']
 
         if not token:
             return make_response('Token is invalid', 401)

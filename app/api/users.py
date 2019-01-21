@@ -29,7 +29,7 @@ class UserView(FlaskView):
     def get(self, id: int):
         """Retrieve one user"""
 
-        response = UserService.one(id)
+        response = UserService.one(id=id)
 
         if not isinstance(response, User):
             return response

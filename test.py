@@ -247,14 +247,6 @@ class TestVault(Test):
 
             self.assertEqual(response.status_code, 200)
 
-        # with self.app.test_client() as client:
-        #
-        #     response = client.patch('/vault/2/', headers={'Bearer': "{}".format(token)},
-        #                             data=json.dumps({'title': 'test2', 'description': 'test2'}),
-        #                             content_type='application/json')
-        #
-        #     self.assertEqual(response.status_code, 403)
-
         token = TestVault.create_user()
 
         with self.app.test_client() as client:
@@ -262,7 +254,7 @@ class TestVault(Test):
                                     data=json.dumps({'title': 'test2', 'description': 'test2'}),
                                     content_type='application/json')
 
-            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 403)
 
     def test_vault_delete(self):
 
@@ -280,9 +272,7 @@ class TestVault(Test):
 
             response = client.delete('/vault/1/', headers={'Bearer': '{}'.format(token)})
 
-            self.assertEqual(response.status_code, 204)
-
-        # TODO Need to create 2 users with 2 vaults to check 403 error
+            self.assertEqual(response.status_code, 403)
 
 
 class TestPhoto(Test):
@@ -377,7 +367,7 @@ class TestToken(Test):
 
             token = TestUser.create_admin_user()
 
-            response = client.get('/user/?Bearer={}'.format(token))
+            response = client.get('/user/', headers={'Bearer': '{}'.format(token)})
 
             self.assertEqual(response.status_code, 200)
 

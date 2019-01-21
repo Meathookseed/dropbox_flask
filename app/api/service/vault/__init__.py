@@ -20,9 +20,9 @@ class VaultService:
 
     @staticmethod
     @token_required
-    def one(current_user: User, id:int, *args) -> Query:
+    def one(current_user: User, **kwargs) -> Query:
 
-        vault = Vault.query.filter_by(vault_id=int(id)).first()
+        vault = Vault.query.filter_by(vault_id=int(kwargs['id'])).first()
 
         if vault not in current_user.vaults:
             return make_response('Forbidden', 403)
@@ -54,10 +54,7 @@ class VaultService:
 
         vault = Vault.query.filter_by(vault_id=id).first()
 
-        if not vault:
-            return make_response('No content', 204)
-
-        if vault not in current_user.vaults:
+        if not vault or vault not in current_user.vaults:
             return make_response('Forbidden', 403)
 
         if 'description' in data:
@@ -76,10 +73,7 @@ class VaultService:
 
         vault = Vault.query.filter_by(vault_id=id).first()
 
-        if not vault:
-            return make_response('No content', 204)
-
-        if vault not in current_user.vaults:
+        if not vault or vault not in current_user.vaults:
             return make_response('Forbidden', 403)
 
         dbsession.delete(vault)

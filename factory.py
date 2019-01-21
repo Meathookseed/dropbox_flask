@@ -6,6 +6,7 @@ from app import create_app
 
 
 def create_celery_app(app=None):
+
     app, socket = app or create_app('config.yaml')
 
     if os.environ.get('FLASK_ENV') == 'docker':

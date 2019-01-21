@@ -29,13 +29,13 @@ class UserService:
 
     @staticmethod
     @token_required
-    def one(current_user: User, id:int, *args) -> Query:
+    def one(current_user: User, **kwargs) -> Query:
 
-        if not current_user.id == int(id):
+        if not current_user.id == int(kwargs['id']):
 
             return make_response('Forbidden', 403)
 
-        user = User.query.filter_by(id=int(id)).first()
+        user = User.query.filter_by(id=int(kwargs['id'])).first()
 
         return user
 
