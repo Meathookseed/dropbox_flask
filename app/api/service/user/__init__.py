@@ -18,7 +18,7 @@ class UserService:
 
     @staticmethod
     @token_required
-    def list(current_user: User) -> Query:
+    def list(current_user: User, **kwargs) -> Query:
 
         if not current_user.admin:
             return make_response('Forbidden', 403)
