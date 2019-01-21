@@ -2,17 +2,18 @@ from app.api.service import AuthService
 from flask import request
 
 from flask_apispec import ResourceMeta
-from flask_apispec.annotations import doc
+from flask_apispec.annotations import doc, use_kwargs
 
 from flask_classful import FlaskView
+
+from marshmallow import fields
 
 
 class LoginView(FlaskView, metaclass=ResourceMeta):
 
+    @use_kwargs({'username': fields.Str(), 'password': fields.Str()})
     @doc(descrpiption='Login view')
-    def post(self):
-        data = request.get_json()
-
-        return AuthService.login(data=data)
+    def post(self, **kwargs):
+        return AuthService.login(data=kwargs)
 
 

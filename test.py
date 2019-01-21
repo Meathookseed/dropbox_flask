@@ -29,7 +29,7 @@ class TestUser(Test):
     @staticmethod
     def create_admin_user():
 
-        data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
+        data = {'username': 'test', 'password': 'test', "email": "test@test.com", "admin": True}
         UserService.create(data=data)
 
         response = AuthService.login({'username': 'test', 'password': 'test'})
@@ -40,7 +40,7 @@ class TestUser(Test):
 
     @staticmethod
     def create_not_admin_user():
-        data = {'username': 'test2', 'password': 'test', "email": "test2", "admin": False}
+        data = {'username': 'test2', 'password': 'test', "email": "test2@test.com", "admin": False}
         UserService.create(data=data)
 
         response = AuthService.login({'username': 'test2', 'password': 'test'})
@@ -108,7 +108,7 @@ class TestUser(Test):
             response = client.patch('/user/1/', headers={'Bearer': '{}'.format(token)},
                                     data=json.dumps({"username": "updated",
                                                      "password": "1234",
-                                                     "email": "test3",
+                                                     "email": "test@test.com",
                                                      "admin": False}),
                                     content_type='application/json')
 
@@ -133,7 +133,7 @@ class TestUser(Test):
         with self.app.test_client() as client:
             response = client.post('/registration/', data=json.dumps({"username": "test",
                                                                       "password": "test",
-                                                                      "email": "test",
+                                                                      "email": "test@test.ru",
                                                                       "admin": True}),
                                    content_type='application/json')
 
@@ -149,7 +149,7 @@ class TestVault(Test):
 
     @staticmethod
     def create_user():
-        data = {'username': 'test2', 'password': 'tes2t', "email": "test2", "admin": True}
+        data = {'username': 'test2', 'password': 'tes2t', "email": "test2@test.com", "admin": True}
         UserService.create(data=data)
 
         response = AuthService.login({'username': 'test2', 'password': 'tes2t'})
@@ -161,7 +161,7 @@ class TestVault(Test):
     @staticmethod
     def create_vault():
 
-        data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
+        data = {'username': 'test', 'password': 'test', "email": "test@create.com", "admin": True}
         UserService.create(data=data)
 
         response = AuthService.login({'username': 'test', 'password': 'test'})
@@ -279,7 +279,7 @@ class TestPhoto(Test):
 
     @staticmethod
     def create_user():
-        data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
+        data = {'username': 'test', 'password': 'test', "email": "test@test.com", "admin": True}
         UserService.create(data=data)
 
         response = AuthService.login({'username': 'test', 'password': 'test'})
@@ -319,7 +319,7 @@ class TestLogin(Test):
 
     @staticmethod
     def create_user():
-        data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
+        data = {'username': 'test', 'password': 'test', "email": "test@test.com", "admin": True}
         UserService.create(data=data)
 
     def test_login(self):
@@ -376,7 +376,7 @@ class TestFile(Test):
 
     @staticmethod
     def fixture():
-        data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
+        data = {'username': 'test', 'password': 'test', "email": "test@test.com", "admin": True}
         UserService.create(data=data)
 
         response = AuthService.login({'username': 'test', 'password': 'test'})
@@ -399,7 +399,7 @@ class TestFile(Test):
 
     @staticmethod
     def fixture_without_file_create():
-        data = {'username': 'test', 'password': 'test', "email": "test", "admin": True}
+        data = {'username': 'test', 'password': 'test', "email": "test@test2.com", "admin": True}
         UserService.create(data=data)
 
         response = AuthService.login({'username': 'test', 'password': 'test'})

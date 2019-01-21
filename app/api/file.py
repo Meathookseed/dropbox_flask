@@ -6,9 +6,11 @@ from app.api.serializers import FileSchema
 from flask import request, jsonify
 
 from flask_apispec import ResourceMeta
-from flask_apispec.annotations import marshal_with, doc
+from flask_apispec.annotations import marshal_with, doc, use_kwargs
 
 from flask_sqlalchemy import BaseQuery
+
+from marshmallow import fields
 
 
 class FileView(FlaskView, metaclass=ResourceMeta):
@@ -45,19 +47,19 @@ class FileView(FlaskView, metaclass=ResourceMeta):
 
         return jsonify({'user': output})
 
+    @use_kwargs({'name': fields.Str(),
+                 "description": fields.Str()})
     @doc(description='Creates new file, <vault_id> - vault prop')
-    def post(self, vault_id: int):
+    def post(self, vault_id: int, **kwargs):
         """Create User"""
+        return FileService.create(vault_id=vault_id, data=kwargs)
 
-        data = request.get_json()
-
-        return FileService.create(vault_id=vault_id, data=data)
-
+    @use_kwargs({'name': fields.Str(),
+                 "description": fields.Str()})
     @doc(description='Updates file, <id> - file prop')
-    def patch(self, id: int):
+    def patch(self, id: int, **kwargs):
         """Update user"""
-        data = request.get_json()
-        return FileService.update(data=data, id=id)
+        return FileService.update(data=kwargs, id=id)
 
     @doc(description='Deletes file, <id> - file prop ')
     def delete(self, id: int):

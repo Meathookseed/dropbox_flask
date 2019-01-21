@@ -6,9 +6,11 @@ from flask import request, jsonify
 from flask_classful import FlaskView, route
 
 from flask_apispec import ResourceMeta
-from flask_apispec.annotations import marshal_with, doc
+from flask_apispec.annotations import marshal_with, doc, use_kwargs
 
 from flask_sqlalchemy import BaseQuery
+
+from marshmallow import fields
 
 
 class VaultView(FlaskView, metaclass=ResourceMeta):
@@ -46,19 +48,21 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
 
         return jsonify({'vault': output})
 
+    @use_kwargs({'title': fields.Str(),
+                 'description': fields.Str()})
     @doc(description='Creates new vault, <id> - user prop')
-    def post(self, id: int):
-        """Create User"""
-        data = request.get_json()
-        return VaultService.create(data=data, id=id)
+    def post(self, id: int, **kwargs):
+        """Creates Vault"""
+        return VaultService.create(data=kwargs, id=id)
 
+    @use_kwargs({'title': fields.Str(),
+                 'description': fields.Str()})
     @doc(description='Updates vault, <id> - vault prop')
-    def patch(self, id: int):
-        """Update user"""
-        data = request.get_json()
-        return VaultService.update(data=data, id=id)
+    def patch(self, id: int, **kwargs):
+        """Updates Vault"""
+        return VaultService.update(data=kwargs, id=id)
 
     @doc(description='Deletes vault, <id> - vault prop ')
     def delete(self, id: int):
-        """Delete User"""
+        """Delete Vault"""
         return VaultService.delete(id=id)
