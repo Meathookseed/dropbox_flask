@@ -1,7 +1,7 @@
 from app.api.service import UserService
 from app.api.serializers import UserSchema
 from app.models.models import User
-from flask import request, jsonify
+from flask import jsonify
 from flask_classful import FlaskView
 from flask_apispec import ResourceMeta
 from flask_apispec.annotations import marshal_with, doc, use_kwargs

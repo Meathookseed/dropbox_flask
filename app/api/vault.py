@@ -18,10 +18,13 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
     @route('user_<id>/')
     @marshal_with(VaultSchema(many=True))
     @doc(description='Get List of all users vaults, <id> - user prop')
-    def index(self, id: int):
+    @use_kwargs({'Bearer': fields.Str(required=True, description=
+                'Authorization HTTP header with JWT refresh token')},
+                locations=['headers'])
+    def index(self, id: int, **kwargs):
         """List of users"""
 
-        response = VaultService.list(id=id)
+        response = VaultService.list(id=id , **kwargs)
 
         if not isinstance(response, BaseQuery):
             return response
@@ -34,10 +37,13 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
 
     @marshal_with(VaultSchema())
     @doc(description='Retrieve one vault, <id> - vault prop')
-    def get(self, id: int):
+    @use_kwargs({'Bearer': fields.Str(required=True, description=
+                'Authorization HTTP header with JWT refresh token')},
+                locations=['headers'])
+    def get(self, id: int, **kwargs):
         """Retrieve one user"""
 
-        vault = VaultService.one(id=id)
+        vault = VaultService.one(id=id, **kwargs)
 
         if not isinstance(vault, Vault):
             return vault
@@ -49,19 +55,22 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
         return jsonify({'vault': output})
 
     @use_kwargs({'title': fields.Str(),
-                 'description': fields.Str()})
+                 'description': fields.Str(),
+                 'token': fields.Str()})
     @doc(description='Creates new vault, <id> - user prop')
     def post(self, id: int, **kwargs):
         """Creates Vault"""
         return VaultService.create(data=kwargs, id=id)
 
     @use_kwargs({'title': fields.Str(),
-                 'description': fields.Str()})
+                 'description': fields.Str(),
+                 'token': fields.Str()})
     @doc(description='Updates vault, <id> - vault prop')
     def patch(self, id: int, **kwargs):
         """Updates Vault"""
         return VaultService.update(data=kwargs, id=id)
 
+    @use_kwargs({'token': fields.Str()})
     @doc(description='Deletes vault, <id> - vault prop ')
     def delete(self, id: int):
         """Delete Vault"""
