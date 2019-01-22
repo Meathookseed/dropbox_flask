@@ -1,7 +1,7 @@
 from app.api.service import VaultService
 from app.api.serializers import VaultSchema
 from app.models.models import Vault
-from flask import request, jsonify
+from flask import jsonify
 
 from flask_classful import FlaskView, route
 

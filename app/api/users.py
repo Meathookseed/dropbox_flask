@@ -12,6 +12,9 @@ from marshmallow import fields
 class UserView(FlaskView, metaclass=ResourceMeta):
 
     @marshal_with(schema=UserSchema(many=True))
+    @use_kwargs({'Bearer': fields.Str(required=True,
+                                      description='Authorization HTTP header with JWT refresh token')},
+                locations=['headers'])
     def index(self, **kwargs):
         """Get list of all users."""
         response = UserService.list(**kwargs)
@@ -26,8 +29,8 @@ class UserView(FlaskView, metaclass=ResourceMeta):
         return jsonify({"users": user_result})
 
     @marshal_with(schema=UserSchema())
-    @use_kwargs({'Bearer': fields.Str(required=True, description=
-                'Authorization HTTP header with JWT refresh token, like: Authorization: Bearer asdf.qwer.zxcv')},
+    @use_kwargs({'Bearer': fields.Str(required=True,
+                                      description='Authorization HTTP header with JWT refresh token')},
                 locations=['headers'])
     def get(self, id: int, **kwargs):
         """Retrieve one user."""
@@ -47,13 +50,15 @@ class UserView(FlaskView, metaclass=ResourceMeta):
                  'email': fields.Email(),
                  'password': fields.Str(),
                  'username': fields.Str(),
-                 'token': fields.Str()})
+                 'token': fields.Str(required=False)})
     @doc(description='Updates user')
     def patch(self, id: int, **kwargs):
         """Update user"""
         return UserService.update(data=kwargs, id=id)
 
-    @use_kwargs({'token': fields.Str()})
+    @use_kwargs({'Bearer': fields.Str(required=True,
+                                      description='Authorization HTTP header with JWT refresh token')},
+                locations=['headers'])
     @doc(description='Deletes user')
     def delete(self, id: int):
         """Delete User"""
