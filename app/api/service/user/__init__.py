@@ -18,10 +18,10 @@ class UserService:
 
     @staticmethod
     @token_required
-    def list(current_user: User, **kwargs) -> Query:
+    def list(current_user: User, **kwargs) -> Query or None:
 
         if not current_user.admin:
-            return make_response('Forbidden', 403)
+            return None
 
         users = User.query.all()
 
@@ -29,23 +29,23 @@ class UserService:
 
     @staticmethod
     @token_required
-    def one(current_user: User, **kwargs) -> Query:
+    def one(current_user: User, **kwargs) -> Query or bool:
 
         if not current_user.id == int(kwargs['id']):
 
-            return make_response('Forbidden', 403)
+            return False
 
         user = User.query.filter_by(id=int(kwargs['id'])).first()
 
         return user
 
     @staticmethod
-    def create(**kwargs) -> Response:
+    def create(**kwargs) -> bool or dict:
 
         data = kwargs['data']
 
         if not data:
-            return make_response('No content', 204)
+            return False
 
         try:
             data['admin']
@@ -80,17 +80,17 @@ class UserService:
         token = jwt.encode({'public_id': new_user.public_id},
                            current_app.config['SECRET_KEY'])
 
-        return jsonify({'token': token.decode('utf-8'), 'id': new_user.id})
+        return {'token': token, 'user_id': new_user.id}
 
     @staticmethod
     @token_required
-    def update(current_user: User, **kwargs) -> Response:
+    def update(current_user: User, **kwargs) -> bool or str:
 
-        if not kwargs['data']:
-            return make_response('No content', 204)
+        if bool(kwargs['data']) is False:
+            return 'No data'
 
         if not current_user.id == kwargs['id'] and not current_user.admin:
-            return make_response('Forbidden', 403)
+            return False
 
         user = User.query.filter_by(id=int(kwargs['id'])).first()
 
@@ -110,14 +110,14 @@ class UserService:
 
         dbsession.commit()
 
-        return make_response('Updated', 200)
+        return True
 
     @staticmethod
     @token_required
-    def delete(current_user: User, **kwargs) -> Response:
+    def delete(current_user: User, **kwargs) -> bool:
 
         if not current_user.id == int(kwargs['id']) and not current_user.admin:
-            return make_response('Forbidden', 403)
+            return False
 
         user = User.query.filter_by(id=int(kwargs['id'])).first()
 
@@ -125,4 +125,4 @@ class UserService:
 
         dbsession.commit()
 
-        return make_response('Deleted', 200)
+        return True

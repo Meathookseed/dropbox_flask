@@ -1,65 +1,74 @@
 from app.api.service import UserService
 from app.api.serializers import UserSchema
-from app.models.models import User
-from flask import jsonify
+from flask import jsonify, make_response
 from flask_classful import FlaskView
 from flask_apispec import ResourceMeta
 from flask_apispec.annotations import marshal_with, doc, use_kwargs
 from marshmallow import fields
 
 
-@doc(tags=['user'])
+@doc(tags=['User'])
 class UserView(FlaskView, metaclass=ResourceMeta):
 
-    @marshal_with(schema=UserSchema(many=True))
-    @use_kwargs({'Bearer': fields.Str(required=False,
-                                      description='Authorization HTTP header with JWT refresh token')},
-                locations=['headers'])
-    def index(self, **kwargs):
-        """Get list of all users."""
-        response = UserService.list(**kwargs)
-
-        if not isinstance(response, list):
-            return response
-
-        user_schema = UserSchema(many=True)
-
-        user_result = user_schema.dump(response).data
-
-        return jsonify({"users": user_result})
+    DOCS_PARAMS_FOR_TOKEN = {'Bearer': {"description": "Custom HTTP header which contains the token",
+                                        "in": "header",
+                                        "type": "string",
+                                        "required": False}}
 
     @marshal_with(schema=UserSchema())
-    @use_kwargs({'Bearer': fields.Str(required=False,
-                                      description='Authorization HTTP header with JWT refresh token')},
-                locations=['headers'])
+    @doc(description='Get list of all users. ',
+         params=DOCS_PARAMS_FOR_TOKEN)
+    def index(self, **kwargs):
+        """Get list of all users."""
+
+        result = UserService.list(**kwargs)
+
+        if result is None:
+            return make_response('No permission', 403)
+
+        return jsonify({"users": UserSchema(many=True).dump(result).data})
+
+    @marshal_with(schema=UserSchema())
+    @doc(description='Retrieve user by id. ',
+         params=DOCS_PARAMS_FOR_TOKEN)
     def get(self, id: int, **kwargs):
         """Retrieve one user."""
 
-        response = UserService.one(id=id, **kwargs)
+        result = UserService.one(id=id, **kwargs)
 
-        if not isinstance(response, User):
-            return response
+        if result is False:
+            return make_response('No permission', 403)
 
-        user_schema = UserSchema()
-
-        output = user_schema.dump(response).data
-
-        return jsonify({'user': output})
+        return jsonify({'user': UserSchema().dump(result).data})
 
     @use_kwargs({'admin': fields.Bool(),
                  'email': fields.Email(),
                  'password': fields.Str(),
                  'username': fields.Str(),
-                 'token': fields.Str(required=False)})
-    @doc(description='Updates user')
+                 })
+    @marshal_with(None)
+    @doc(description='Updates user. ',
+         params=DOCS_PARAMS_FOR_TOKEN)
     def patch(self, id: int, **kwargs):
         """Update user"""
-        return UserService.update(data=kwargs, id=id)
 
-    @use_kwargs({'Bearer': fields.Str(required=False,
-                                      description='Authorization HTTP header with JWT refresh token')},
-                locations=['headers'])
-    @doc(description='Deletes user')
+        result = UserService.update(data=kwargs, id=id)
+
+        if result is True:
+            return make_response('User updated', 200)
+        elif result == 'No data':
+            return make_response('No data', 204)
+        elif result is False:
+            return make_response('No permission', 403)
+
+    @marshal_with(None)
+    @doc(description='Deletes user. ',
+         params=DOCS_PARAMS_FOR_TOKEN)
     def delete(self, id: int, **kwargs):
         """Delete User"""
-        return UserService.delete(id=id, **kwargs)
+        result = UserService.delete(id=id, **kwargs)
+
+        if result is False:
+            return make_response('No permission', 403)
+        elif result is True:
+            return make_response('Deleted', 200)

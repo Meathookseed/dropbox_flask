@@ -1,5 +1,5 @@
 from app.api.service import UserService
-
+from flask import make_response, jsonify
 from flask_classful import FlaskView
 
 from flask_apispec import ResourceMeta
@@ -17,4 +17,10 @@ class RegistrationView(FlaskView, metaclass=ResourceMeta):
     @doc(description='Creates new user')
     def post(self, **kwargs):
         """Create User"""
-        return UserService.create(data=kwargs)
+
+        result = UserService.create(data=kwargs)
+
+        if result is False:
+            return make_response('No data', 204)
+
+        return jsonify({'token': result['token'].decode('utf-8'), 'id': result['user_id']})
