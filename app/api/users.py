@@ -12,7 +12,7 @@ from marshmallow import fields
 class UserView(FlaskView, metaclass=ResourceMeta):
 
     @marshal_with(schema=UserSchema(many=True))
-    @use_kwargs({'Bearer': fields.Str(required=True,
+    @use_kwargs({'Bearer': fields.Str(required=False,
                                       description='Authorization HTTP header with JWT refresh token')},
                 locations=['headers'])
     def index(self, **kwargs):
@@ -29,7 +29,7 @@ class UserView(FlaskView, metaclass=ResourceMeta):
         return jsonify({"users": user_result})
 
     @marshal_with(schema=UserSchema())
-    @use_kwargs({'Bearer': fields.Str(required=True,
+    @use_kwargs({'Bearer': fields.Str(required=False,
                                       description='Authorization HTTP header with JWT refresh token')},
                 locations=['headers'])
     def get(self, id: int, **kwargs):
@@ -56,10 +56,10 @@ class UserView(FlaskView, metaclass=ResourceMeta):
         """Update user"""
         return UserService.update(data=kwargs, id=id)
 
-    @use_kwargs({'Bearer': fields.Str(required=True,
+    @use_kwargs({'Bearer': fields.Str(required=False,
                                       description='Authorization HTTP header with JWT refresh token')},
                 locations=['headers'])
     @doc(description='Deletes user')
-    def delete(self, id: int):
+    def delete(self, id: int, **kwargs):
         """Delete User"""
-        return UserService.delete(id=id)
+        return UserService.delete(id=id, **kwargs)

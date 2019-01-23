@@ -5,6 +5,7 @@ from factory import create_celery_app
 
 celery = create_celery_app()
 
+
 @celery.task
 def send_email(data: dict):
         msg = Message('Registration at flask_dropbox',

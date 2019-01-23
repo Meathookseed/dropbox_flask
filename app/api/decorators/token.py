@@ -17,7 +17,7 @@ def token_required(f):
         if 'Bearer' in request.headers:
             token = request.headers['Bearer']
 
-        if 'token' in kwargs.keys():
+        elif 'token' in kwargs.keys():
             token = kwargs['token']
 
         if not token:

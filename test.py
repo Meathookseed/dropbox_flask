@@ -426,7 +426,7 @@ class TestFile(Test):
                                    content_type='application/json')
             self.assertEqual(response.status_code, 200)
 
-            response = client.post('/file/2/',headers={'Bearer': '{}'.format(token)},
+            response = client.post('/file/2/', headers={'Bearer': '{}'.format(token)},
                                    data=json.dumps({"name": "first file", "description": "fixture"}),
                                    content_type='application/json')
 

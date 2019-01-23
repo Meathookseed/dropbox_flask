@@ -13,65 +13,59 @@ from flask_sqlalchemy import BaseQuery
 from marshmallow import fields
 
 
+@doc(tags=['Vault'])
 class VaultView(FlaskView, metaclass=ResourceMeta):
 
+    DOCS_PARAMS_FOR_TOKEN = {'Bearer': {"description": "Custom HTTP header which contains the token",
+                                        "in": "header",
+                                        "type": "string",
+                                        "required": False}}
+
     @route('user_<id>/')
-    @marshal_with(VaultSchema(many=True))
-    @doc(description='Get List of all users vaults, <id> - user prop')
-    @use_kwargs({'Bearer': fields.Str(required=True, description=
-                'Authorization HTTP header with JWT refresh token')},
-                locations=['headers'])
+    @marshal_with(VaultSchema())
+    @doc(description='Get List of all users vaults, <id> - user prop',
+         params=DOCS_PARAMS_FOR_TOKEN)
     def index(self, id: int, **kwargs):
         """List of users"""
 
-        response = VaultService.list(id=id , **kwargs)
+        result = VaultService.list(id=id , **kwargs)
 
-        if not isinstance(response, BaseQuery):
-            return response
+        if not isinstance(result, BaseQuery):
+            return result
 
-        schema = VaultSchema(many=True)
-
-        output = schema.dump(response).data
-
-        return jsonify({'vaults': output})
+        return jsonify({'vaults': VaultSchema(many=True).dump(result).data})
 
     @marshal_with(VaultSchema())
-    @doc(description='Retrieve one vault, <id> - vault prop')
-    @use_kwargs({'Bearer': fields.Str(required=True, description=
-                'Authorization HTTP header with JWT refresh token')},
-                locations=['headers'])
+    @doc(description='Retrieve one vault, <id> - vault prop',
+         params=DOCS_PARAMS_FOR_TOKEN)
     def get(self, id: int, **kwargs):
         """Retrieve one user"""
 
-        vault = VaultService.one(id=id, **kwargs)
+        result = VaultService.one(id=id, **kwargs)
 
-        if not isinstance(vault, Vault):
-            return vault
+        if not isinstance(result, Vault):
+            return result
 
-        schema = VaultSchema()
-
-        output = schema.dump(vault).data
-
-        return jsonify({'vault': output})
+        return jsonify({'vault': VaultSchema().dump(result).data})
 
     @use_kwargs({'title': fields.Str(),
-                 'description': fields.Str(),
-                 'token': fields.Str()})
-    @doc(description='Creates new vault, <id> - user prop')
+                 'description': fields.Str()})
+    @doc(description='Creates vault, <id> - vault prop',
+         params=DOCS_PARAMS_FOR_TOKEN)
     def post(self, id: int, **kwargs):
         """Creates Vault"""
         return VaultService.create(data=kwargs, id=id)
 
     @use_kwargs({'title': fields.Str(),
-                 'description': fields.Str(),
-                 'token': fields.Str()})
-    @doc(description='Updates vault, <id> - vault prop')
+                'description': fields.Str()})
+    @doc(description='Updates vault, <id> - vault prop',
+         params=DOCS_PARAMS_FOR_TOKEN)
     def patch(self, id: int, **kwargs):
         """Updates Vault"""
         return VaultService.update(data=kwargs, id=id)
 
-    @use_kwargs({'token': fields.Str()})
-    @doc(description='Deletes vault, <id> - vault prop ')
+    @doc(description='Delete vault, <id> - vault prop',
+         params=DOCS_PARAMS_FOR_TOKEN)
     def delete(self, id: int):
         """Delete Vault"""
         return VaultService.delete(id=id)
