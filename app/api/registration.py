@@ -8,13 +8,15 @@ from flask_apispec.annotations import doc, use_kwargs
 from marshmallow import fields
 
 
+@doc(tags=['Registration'])
 class RegistrationView(FlaskView, metaclass=ResourceMeta):
 
     @use_kwargs({'username': fields.Str(),
                  'email': fields.Email(),
                  "password": fields.Str(),
                  })
-    @doc(description='Creates new user')
+    @doc(description='Creates new user',
+         responses={'204': {'description': 'No data'}})
     def post(self, **kwargs):
         """Create User"""
 

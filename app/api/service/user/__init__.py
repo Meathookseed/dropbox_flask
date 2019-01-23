@@ -3,7 +3,7 @@ from app.exceptions import UniqueUserAttributes
 from app.models.models import User
 from app.shortcuts import dbsession
 
-from flask import jsonify, current_app, make_response, Response
+from flask import current_app
 
 from sqlalchemy.orm import Query
 

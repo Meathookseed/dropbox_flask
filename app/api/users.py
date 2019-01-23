@@ -15,9 +15,12 @@ class UserView(FlaskView, metaclass=ResourceMeta):
                                         "type": "string",
                                         "required": False}}
 
-    @marshal_with(schema=UserSchema())
+    @marshal_with(schema=UserSchema(), code='200')
     @doc(description='Get list of all users. ',
-         params=DOCS_PARAMS_FOR_TOKEN)
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses={
+             '403': {'description': 'No permission'},
+         })
     def index(self, **kwargs):
         """Get list of all users."""
 
@@ -28,9 +31,12 @@ class UserView(FlaskView, metaclass=ResourceMeta):
 
         return jsonify({"users": UserSchema(many=True).dump(result).data})
 
-    @marshal_with(schema=UserSchema())
+    @marshal_with(schema=UserSchema(), code='200')
     @doc(description='Retrieve user by id. ',
-         params=DOCS_PARAMS_FOR_TOKEN)
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses={
+             '403': {'description': 'No permission'}
+         })
     def get(self, id: int, **kwargs):
         """Retrieve one user."""
 
@@ -48,7 +54,11 @@ class UserView(FlaskView, metaclass=ResourceMeta):
                  })
     @marshal_with(None)
     @doc(description='Updates user. ',
-         params=DOCS_PARAMS_FOR_TOKEN)
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses={
+             '403': {'description': 'No permission'},
+             '200': {'description': 'User Updated'},
+             '204': {'description': 'No data'}})
     def patch(self, id: int, **kwargs):
         """Update user"""
 
@@ -63,7 +73,11 @@ class UserView(FlaskView, metaclass=ResourceMeta):
 
     @marshal_with(None)
     @doc(description='Deletes user. ',
-         params=DOCS_PARAMS_FOR_TOKEN)
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses={
+             '200': {'description': 'User deleted'},
+             '403': {'description': 'No permission'}
+         })
     def delete(self, id: int, **kwargs):
         """Delete User"""
         result = UserService.delete(id=id, **kwargs)

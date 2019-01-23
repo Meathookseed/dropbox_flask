@@ -1,7 +1,7 @@
 from app.api.service import VaultService
 from app.api.serializers import VaultSchema
 from app.models.models import Vault
-from flask import jsonify
+from flask import jsonify, make_response
 
 from flask_classful import FlaskView, route
 
@@ -28,10 +28,10 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
     def index(self, id: int, **kwargs):
         """List of users"""
 
-        result = VaultService.list(id=id , **kwargs)
+        result = VaultService.list(id=id, **kwargs)
 
-        if not isinstance(result, BaseQuery):
-            return result
+        if result is False:
+            return make_response('No permission', 403)
 
         return jsonify({'vaults': VaultSchema(many=True).dump(result).data})
 
@@ -43,8 +43,8 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
 
         result = VaultService.one(id=id, **kwargs)
 
-        if not isinstance(result, Vault):
-            return result
+        if result is False:
+            return make_response('No permission', 403)
 
         return jsonify({'vault': VaultSchema().dump(result).data})
 
@@ -54,7 +54,14 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
          params=DOCS_PARAMS_FOR_TOKEN)
     def post(self, id: int, **kwargs):
         """Creates Vault"""
-        return VaultService.create(data=kwargs, id=id)
+        result = VaultService.create(data=kwargs, id=id)
+
+        if result is False:
+            return make_response('No permission', 403)
+        elif result == 'No data':
+            return make_response('No data', 204)
+        elif result is True:
+            return make_response('Created', 200)
 
     @use_kwargs({'title': fields.Str(),
                 'description': fields.Str()})
@@ -62,10 +69,24 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
          params=DOCS_PARAMS_FOR_TOKEN)
     def patch(self, id: int, **kwargs):
         """Updates Vault"""
-        return VaultService.update(data=kwargs, id=id)
+
+        result = VaultService.update(data=kwargs, id=id)
+
+        if result is False:
+            return make_response('No permission', 403)
+        elif result == 'No data':
+            return make_response('No data', 204)
+        elif result is True:
+            return make_response('Updated', 200)
 
     @doc(description='Delete vault, <id> - vault prop',
          params=DOCS_PARAMS_FOR_TOKEN)
     def delete(self, id: int):
         """Delete Vault"""
-        return VaultService.delete(id=id)
+
+        result = VaultService.delete(id=id)
+
+        if result is False:
+            return make_response('No permission', 403)
+        elif result is True:
+            return make_response('Deleted', 200)
