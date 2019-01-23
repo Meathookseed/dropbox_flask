@@ -1,22 +1,21 @@
+import os
+
+from flask import current_app
+from werkzeug.utils import secure_filename
+
 from app.api.decorators.token import token_required
 from app.models.models import User
 from app.shortcuts import dbsession
-
-from flask import current_app, make_response, Response
-
-import os
-
-from werkzeug.utils import secure_filename
 
 
 class PhotoService:
 
     @staticmethod
     @token_required
-    def create(current_user: User, **kwargs) -> Response:
+    def create(current_user: User, **kwargs) -> bool:
 
         if not current_user.id == kwargs['id']:
-            return make_response('Forbidden', 403)
+            return False
 
         photo = kwargs['photo']
 
@@ -32,4 +31,4 @@ class PhotoService:
 
         dbsession.commit()
 
-        return make_response('Updated', 200)
+        return True

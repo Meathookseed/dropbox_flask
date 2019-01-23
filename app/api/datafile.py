@@ -1,11 +1,9 @@
-from app.api.service import DataFileService
-
 from flask import request
-
-from flask_classful import FlaskView
-
 from flask_apispec import ResourceMeta
 from flask_apispec.annotations import doc
+from flask_classful import FlaskView
+
+from app.api.service import DataFileService
 
 
 class DataView(FlaskView, metaclass=ResourceMeta):

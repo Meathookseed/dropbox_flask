@@ -1,8 +1,8 @@
-from app.api.decorators.token import token_required
-from app.models.models import Vault, User
-from app.shortcuts import dbsession
-
 from sqlalchemy.orm import Query
+
+from app.api.decorators.token import token_required
+from app.models.models import User, Vault
+from app.shortcuts import dbsession
 
 
 class VaultService:

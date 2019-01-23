@@ -1,17 +1,14 @@
+import uuid
+
+import jwt
+from flask import current_app
+from sqlalchemy.orm import Query
+from werkzeug.security import generate_password_hash
+
 from app.api.decorators.token import token_required
 from app.exceptions import UniqueUserAttributes
 from app.models.models import User
 from app.shortcuts import dbsession
-
-from flask import current_app
-
-from sqlalchemy.orm import Query
-
-import uuid
-
-import jwt
-
-from werkzeug.security import generate_password_hash
 
 
 class UserService:

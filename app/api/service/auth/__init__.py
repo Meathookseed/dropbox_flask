@@ -1,11 +1,8 @@
-from app.models.models import User
-
-from flask import jsonify, make_response, current_app
-
 import jwt
-
+from flask import Response, current_app, jsonify, make_response
 from werkzeug.security import check_password_hash
-from flask import Response
+
+from app.models.models import User
 
 
 class AuthService:

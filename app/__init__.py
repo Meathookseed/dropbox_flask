@@ -1,11 +1,14 @@
-from flask import Flask
-from app.extensions import db, ma, migrate, docs, mail, cors, socket
-from app.api.serializers.user import UserSchema
-from app.api import (UserView, VaultView, LoginView, FileView, PhotoView, DataView, RegistrationView)
-from from_yaml import YactConfig
-from app.api.service.file import FileService
-from sqlalchemy_utils import database_exists, create_database
 import os
+
+from flask import Flask
+from sqlalchemy_utils import create_database, database_exists
+
+from app.api import (DataView, FileView, LoginView, PhotoView,
+                     RegistrationView, UserView, VaultView)
+from app.api.serializers.user import UserSchema
+from app.api.service.file import FileService
+from app.extensions import cors, db, docs, ma, mail, migrate, socket
+from from_yaml import YactConfig
 
 
 def create_app(config_file):

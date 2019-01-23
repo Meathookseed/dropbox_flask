@@ -1,67 +1,92 @@
-from flask_classful import FlaskView, route
-from app.models.models import File
-from app.api.service import FileService
-from app.api.serializers import FileSchema
-
-from flask import request, jsonify
-
+from flask import jsonify, make_response
 from flask_apispec import ResourceMeta
-from flask_apispec.annotations import marshal_with, doc, use_kwargs
-
-from flask_sqlalchemy import BaseQuery
-
+from flask_apispec.annotations import doc, marshal_with, use_kwargs
+from flask_classful import FlaskView, route
 from marshmallow import fields
 
+from app.api.serializers import FileSchema
+from app.api.service import FileService
+from app.openapi_doc_parameters import *
 
+
+@doc(tags=['File'])
 class FileView(FlaskView, metaclass=ResourceMeta):
 
     @route('vault_<vault_id>/',)
-    @marshal_with(FileSchema(many=True))
-    @doc(description='Get List of all files, <vault_id> - vault prop')
+    @marshal_with(FileSchema(), code='200')
+    @doc(description='Get List of all files, <vault_id> - file prop',
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses=GET_CODES)
     def index(self, vault_id: int):
         """List of files"""
-        response = FileService.list(vault_id=vault_id)
 
-        if not isinstance(response, BaseQuery):
-            return response
+        result = FileService.list(vault_id=vault_id)
 
-        file_schema = FileSchema(many=True)
+        if result is False:
+            return make_response('No permission', 403)
 
-        output = file_schema.dump(response).data
+        return jsonify({'files': FileSchema(many=True).dump(result).data})
 
-        return jsonify({'files': output})
-
-    @marshal_with(FileSchema())
-    @doc(description='Retrieve one file, <id> - file prop')
+    @marshal_with(FileSchema(), code='200')
+    @doc(description='Retrieve one file, <id> - file prop',
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses=GET_CODES)
     def get(self, id: int):
         """Retrieve one user"""
 
-        file = FileService.one(id=id)
+        result = FileService.one(id=id)
 
-        if not isinstance(file, File):
-            return file
+        if result is False:
+            return make_response('No permission', 403)
 
-        file_schema = FileSchema()
-
-        output = file_schema.dump(file).data
-
-        return jsonify({'user': output})
+        return jsonify({'user': FileSchema().dump(result).data})
 
     @use_kwargs({'name': fields.Str(),
                  "description": fields.Str()})
-    @doc(description='Creates new file, <vault_id> - vault prop')
+    @marshal_with(None)
+    @doc(description='Creates new file, <vault_id> - file prop',
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses=POST_CODES)
     def post(self, vault_id: int, **kwargs):
         """Create User"""
-        return FileService.create(vault_id=vault_id, data=kwargs)
+
+        result = FileService.create(vault_id=vault_id, data=kwargs)
+
+        if result is False:
+            return make_response('No permission', 403)
+        elif result == 'No data':
+            return make_response('No data', 204)
+
+        return jsonify({'file_id': result})
 
     @use_kwargs({'name': fields.Str(),
                  "description": fields.Str()})
-    @doc(description='Updates file, <id> - file prop')
+    @marshal_with(None)
+    @doc(description='Updates file, <id> - file prop',
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses=PATCH_CODES)
     def patch(self, id: int, **kwargs):
         """Update user"""
-        return FileService.update(data=kwargs, id=id)
 
-    @doc(description='Deletes file, <id> - file prop ')
+        result = FileService.update(data=kwargs, id=id)
+
+        if result is False:
+            return make_response('No permission', 403)
+        elif result == 'No data':
+            return make_response('No data', 204)
+
+        return make_response('Updated', 200)
+
+    @marshal_with(None)
+    @doc(description='Delete vault, <id> - vault prop',
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses=DELETE_CODES)
     def delete(self, id: int):
         """Delete User"""
-        return FileService.delete(id=id)
+
+        result = FileService.delete(id=id)
+
+        if result is False:
+            return make_response('No permission', 403)
+        elif result is True:
+            return make_response('Deleted', 200)

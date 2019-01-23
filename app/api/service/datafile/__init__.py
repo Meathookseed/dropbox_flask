@@ -1,11 +1,11 @@
-from app.shortcuts import dbsession
-from app.api.decorators.token import token_required
-from app.models.models import File, User
-
-from flask import jsonify, current_app, make_response, Response
 import os
 
+from flask import Response, current_app, jsonify, make_response
 from werkzeug.utils import secure_filename
+
+from app.api.decorators.token import token_required
+from app.models.models import File, User
+from app.shortcuts import dbsession
 
 
 class DataFileService:

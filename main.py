@@ -4,7 +4,6 @@ from app import create_app
 from app.api.serializers import UserSchema, VaultSchema
 from app.api.service import UserService, VaultService
 
-
 app, socket = create_app(config_file='config.yaml')
 
 

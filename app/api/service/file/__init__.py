@@ -1,45 +1,47 @@
-from app.api.decorators.token import token_required
-from app.models.models import File, Vault, User
-from app.shortcuts import dbsession
-from flask import jsonify, make_response, Response
-from sqlalchemy.orm import Query
 import os
+
+from app.api.decorators.token import token_required
+from app.models.models import File, User, Vault
+from app.shortcuts import dbsession
 
 
 class FileService:
 
     @staticmethod
     @token_required
-    def list(current_user: User, **kwargs)-> Query:
+    def list(current_user: User, **kwargs)-> bool:
 
         files = File.query.filter_by(vault_id=kwargs['vault_id'])
 
         vault = Vault.query.filter_by(vault_id=kwargs['vault_id']).first()
 
         if vault not in current_user.vaults:
-            return make_response('Forbidden', 403)
+            return False
 
         return files
 
     @staticmethod
     @token_required
-    def one(current_user: User, **kwargs) -> Query:
+    def one(current_user: User, **kwargs) -> bool:
 
         file = File.query.filter_by(file_id=kwargs['id']).first()
 
         if file not in current_user.files:
-            return make_response('Forbidden', 403)
+            return False
 
         return file
 
     @staticmethod
     @token_required
-    def create(current_user: User, **kwargs) -> Response:
+    def create(current_user: User, **kwargs) -> bool or str or dict:
 
         vault = Vault.query.filter_by(vault_id=kwargs['vault_id']).first()
 
         if vault not in current_user.vaults:
-            return make_response('Forbidden', 403)
+            return False
+
+        if bool(kwargs['data']) is False:
+            return 'No data'
 
         data = kwargs['data']
 
@@ -52,16 +54,19 @@ class FileService:
 
         dbsession.commit()
 
-        return jsonify({"file_id": new_file.file_id})
+        return new_file.file_id
 
     @staticmethod
     @token_required
-    def update(current_user: User, **kwargs) -> Response:
+    def update(current_user: User, **kwargs) -> bool or str:
 
         file = File.query.filter_by(file_id=kwargs['id']).first()
 
         if not file or not current_user.id == file.owner_id:
-            return make_response('Forbidden', 403)
+            return False
+
+        if bool(kwargs['data']) is False:
+            return 'No data'
 
         data = kwargs['data']
 
@@ -73,16 +78,16 @@ class FileService:
 
         dbsession.commit()
 
-        return make_response('Updated', 200)
+        return True
 
     @staticmethod
     @token_required
-    def delete(current_user: User, **kwargs) -> Response:
+    def delete(current_user: User, **kwargs) -> bool:
 
         file = File.query.filter_by(file_id=kwargs['id']).first()
 
         if not file or not current_user.id == file.owner_id:
-            return make_response('Forbidden', 403)
+            return False
 
         dbsession.delete(file)
         dbsession.commit()
@@ -90,4 +95,4 @@ class FileService:
         if file.data:
             os.remove(file.data)
 
-        return make_response('Deleted', 200)
+        return True
