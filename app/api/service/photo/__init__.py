@@ -12,10 +12,13 @@ class PhotoService:
 
     @staticmethod
     @token_required
-    def create(current_user: User, **kwargs) -> bool:
+    def create(current_user: User, **kwargs) -> bool or str:
 
         if not current_user.id == kwargs['id']:
             return False
+
+        if bool(kwargs['photo']) is False:
+            return 'No data'
 
         photo = kwargs['photo']
 
@@ -23,7 +26,7 @@ class PhotoService:
 
         file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
 
-        photo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        photo.save(file_folder)
 
         user = User.query.filter_by(id=kwargs['id']).first()
 

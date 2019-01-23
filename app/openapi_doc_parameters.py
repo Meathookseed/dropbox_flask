@@ -4,6 +4,16 @@ DOCS_PARAMS_FOR_TOKEN = {'Bearer': {"description": "Custom HTTP header which con
                                     "type": "string",
                                     "required": False}}
 
+DOCS_PARAMS_FOR_PHOTO = {'Bearer': {"description": "Custom HTTP header which contains the token",
+                                    "in": "header",
+                                    "type": "string",
+                                    "required": False},
+                         'photo': {"description": "Photo upload",
+                                   "content-type": "multipart/form-data",
+                                                  "in": "header",
+                                                  "type": "file",
+                                                  "required": False}}
+
 GET_CODES = {'403': {'description': 'No permission'}}
 
 POST_CODES = {'403': {'description': 'No permission'},
