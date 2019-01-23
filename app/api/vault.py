@@ -1,14 +1,12 @@
 from app.api.service import VaultService
 from app.api.serializers import VaultSchema
-from app.models.models import Vault
+
 from flask import jsonify, make_response
 
 from flask_classful import FlaskView, route
 
 from flask_apispec import ResourceMeta
 from flask_apispec.annotations import marshal_with, doc, use_kwargs
-
-from flask_sqlalchemy import BaseQuery
 
 from marshmallow import fields
 
@@ -22,9 +20,11 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
                                         "required": False}}
 
     @route('user_<id>/')
-    @marshal_with(VaultSchema())
+    @marshal_with(VaultSchema(), code=200)
     @doc(description='Get List of all users vaults, <id> - user prop',
-         params=DOCS_PARAMS_FOR_TOKEN)
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses={
+             '403': {'description': 'No permission'}})
     def index(self, id: int, **kwargs):
         """List of users"""
 
@@ -35,9 +35,11 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
 
         return jsonify({'vaults': VaultSchema(many=True).dump(result).data})
 
-    @marshal_with(VaultSchema())
+    @marshal_with(VaultSchema(), code=200)
     @doc(description='Retrieve one vault, <id> - vault prop',
-         params=DOCS_PARAMS_FOR_TOKEN)
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses={
+             '403': {'description': 'No permission'}})
     def get(self, id: int, **kwargs):
         """Retrieve one user"""
 
@@ -50,8 +52,13 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
 
     @use_kwargs({'title': fields.Str(),
                  'description': fields.Str()})
+    @marshal_with(None)
     @doc(description='Creates vault, <id> - vault prop',
-         params=DOCS_PARAMS_FOR_TOKEN)
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses={
+             '403': {'description': 'No permission'},
+             '200': {'description': 'User Created'},
+             '204': {'description': 'No data'}})
     def post(self, id: int, **kwargs):
         """Creates Vault"""
         result = VaultService.create(data=kwargs, id=id)
@@ -65,8 +72,13 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
 
     @use_kwargs({'title': fields.Str(),
                 'description': fields.Str()})
+    @marshal_with(None)
     @doc(description='Updates vault, <id> - vault prop',
-         params=DOCS_PARAMS_FOR_TOKEN)
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses={
+             '403': {'description': 'No permission'},
+             '200': {'description': 'Vault Updated'},
+             '204': {'description': 'No data'}})
     def patch(self, id: int, **kwargs):
         """Updates Vault"""
 
@@ -79,8 +91,12 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
         elif result is True:
             return make_response('Updated', 200)
 
+    @marshal_with(None)
     @doc(description='Delete vault, <id> - vault prop',
-         params=DOCS_PARAMS_FOR_TOKEN)
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses={
+             '200': {'description': 'User deleted'},
+             '403': {'description': 'No permission'}})
     def delete(self, id: int):
         """Delete Vault"""
 
