@@ -1,7 +1,7 @@
 version: "3.0"
 debug: true
-mail_username: 'shokran1337@gmail.com'
-mail_password: '39Nik1997'
+mail_username: 'email'
+mail_password: 'secretpassword'
 testing: false
 csrf_enabled: true
 secret_key: 'thisissecret'

@@ -362,10 +362,6 @@ class TestToken(Test):
 
         with self.app.test_client() as client:
 
-            response = client.get('/user/')
-
-            self.assertEqual(response.status_code, 401)
-
             token = TestUser.create_admin_user()
 
             response = client.get('/user/', headers={'Bearer': '{}'.format(token)})

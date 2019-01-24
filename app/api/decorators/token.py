@@ -1,6 +1,7 @@
 from functools import wraps
 
 import jwt
+
 from flask import current_app, make_response, request
 
 from app.models.models import User
@@ -12,14 +13,14 @@ def token_required(f):
     def decorated(*args, **kwargs):
 
         token = None
+        try:
+            if 'Bearer' in request.headers:
+                token = request.headers['Bearer']
 
-        if 'Bearer' in request.headers:
-            token = request.headers['Bearer']
+            elif 'token' in kwargs.keys():
+                token = kwargs['token']
 
-        elif 'token' in kwargs.keys():
-            token = kwargs['token']
-
-        if not token:
+        except jwt.exceptions.DecodeError:
             return make_response('Token is invalid', 401)
 
         data = jwt.decode(token, current_app.config['SECRET_KEY'])

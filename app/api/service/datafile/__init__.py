@@ -26,10 +26,15 @@ class DataFileService:
         if not current_user.id == file.owner_id:
             return make_response('Permission denied', 401)
 
-        file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username, filename)
+        file_folder = os.path.join(
+            current_app.config['UPLOAD_FOLDER'],
+            current_user.username,
+            filename)
 
-        if not os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username)):
-            os.makedirs(os.path.join(current_app.config['UPLOAD_FOLDER'], current_user.username))
+        if not os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'],
+                                           current_user.username)):
+            os.makedirs(os.path.join(current_app.config['UPLOAD_FOLDER'],
+                                     current_user.username))
 
         datafile.save(file_folder)
 
