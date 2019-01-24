@@ -14,7 +14,7 @@ class PhotoService:
     @token_required
     def create(current_user: User, **kwargs) -> bool or str:
 
-        if not current_user.id == kwargs['id']:
+        if current_user is None or not current_user.id == kwargs['id']:
             return False
 
         if bool(kwargs['photo']) is False:

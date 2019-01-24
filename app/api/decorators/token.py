@@ -21,7 +21,8 @@ def token_required(f):
             token = kwargs['token']
 
         if token is None:
-            return make_response('Token is invalid', 401)
+            current_user = None
+            return f(current_user, *args, **kwargs)
 
         data = jwt.decode(token, current_app.config['SECRET_KEY'])
 

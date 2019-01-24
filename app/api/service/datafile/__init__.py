@@ -23,7 +23,7 @@ class DataFileService:
 
         filename = secure_filename(datafile.filename)
 
-        if not current_user.id == file.owner_id:
+        if current_user is None or not current_user.id == file.owner_id:
             return make_response('Permission denied', 401)
 
         file_folder = os.path.join(

@@ -15,7 +15,7 @@ class FileService:
 
         vault = Vault.query.filter_by(vault_id=kwargs['vault_id']).first()
 
-        if vault not in current_user.vaults:
+        if current_user is None or current_user is None or vault not in current_user.vaults:
             return False
 
         return files
@@ -26,7 +26,7 @@ class FileService:
 
         file = File.query.filter_by(file_id=kwargs['id']).first()
 
-        if file not in current_user.files:
+        if current_user is None or file not in current_user.files:
             return False
 
         return file
@@ -37,7 +37,7 @@ class FileService:
 
         vault = Vault.query.filter_by(vault_id=kwargs['vault_id']).first()
 
-        if vault not in current_user.vaults:
+        if current_user is None or  vault not in current_user.vaults:
             return False
 
         if bool(kwargs['data']) is False:
@@ -62,7 +62,7 @@ class FileService:
 
         file = File.query.filter_by(file_id=kwargs['id']).first()
 
-        if not file or not current_user.id == file.owner_id:
+        if current_user is None or not file or not current_user.id == file.owner_id:
             return False
 
         if bool(kwargs['data']) is False:
@@ -86,7 +86,7 @@ class FileService:
 
         file = File.query.filter_by(file_id=kwargs['id']).first()
 
-        if not file or not current_user.id == file.owner_id:
+        if current_user is None or not file or not current_user.id == file.owner_id:
             return False
 
         dbsession.delete(file)

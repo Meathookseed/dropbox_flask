@@ -17,7 +17,7 @@ class UserService:
     @token_required
     def list(current_user: User, **kwargs) -> Query or bool:
 
-        if not current_user.admin:
+        if current_user is None or not current_user.admin:
             return False
 
         users = User.query.all()
@@ -28,7 +28,7 @@ class UserService:
     @token_required
     def one(current_user: User, **kwargs) -> Query or bool:
 
-        if not current_user.id == int(kwargs['id']):
+        if current_user is None or not current_user.id == int(kwargs['id']):
 
             return False
 
@@ -86,7 +86,7 @@ class UserService:
         if bool(kwargs['data']) is False:
             return 'No data'
 
-        if not current_user.id == kwargs['id'] and not current_user.admin:
+        if current_user is None or not current_user.id == kwargs['id'] and not current_user.admin:
             return False
 
         user = User.query.filter_by(id=int(kwargs['id'])).first()
@@ -113,7 +113,7 @@ class UserService:
     @token_required
     def delete(current_user: User, **kwargs) -> bool:
 
-        if not current_user.id == int(kwargs['id']) and not current_user.admin:
+        if current_user is None or not current_user.id == int(kwargs['id']) and not current_user.admin:
             return False
 
         user = User.query.filter_by(id=int(kwargs['id'])).first()

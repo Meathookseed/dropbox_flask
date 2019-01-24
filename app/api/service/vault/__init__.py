@@ -11,7 +11,7 @@ class VaultService:
     @token_required
     def list(current_user: User, **kwargs) -> Query or bool:
 
-        if not current_user.id == int(kwargs['id']):
+        if current_user is None or not current_user.id == int(kwargs['id']):
             return False
 
         vaults = Vault.query.filter_by(owner_id=current_user.id)
@@ -24,7 +24,7 @@ class VaultService:
 
         vault = Vault.query.filter_by(vault_id=int(kwargs['id'])).first()
 
-        if vault not in current_user.vaults:
+        if current_user is None or vault not in current_user.vaults:
             return False
 
         return vault
@@ -33,7 +33,7 @@ class VaultService:
     @token_required
     def create(current_user: User, **kwargs) -> bool or str:
 
-        if not current_user.id == int(kwargs['id']):
+        if current_user is None or not current_user.id == int(kwargs['id']):
             return False
 
         if bool(kwargs['data']) is False:
@@ -56,7 +56,7 @@ class VaultService:
 
         vault = Vault.query.filter_by(vault_id=kwargs['id']).first()
 
-        if not vault or vault not in current_user.vaults:
+        if current_user is None or not vault or vault not in current_user.vaults:
             return False
 
         if bool(kwargs['data']) is False:
@@ -80,7 +80,7 @@ class VaultService:
 
         vault = Vault.query.filter_by(vault_id=kwargs['id']).first()
 
-        if not vault or vault not in current_user.vaults:
+        if current_user is None or not vault or vault not in current_user.vaults:
             return False
 
         dbsession.delete(vault)
