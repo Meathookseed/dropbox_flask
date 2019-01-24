@@ -14,7 +14,7 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
 
     @route('user_<id>/')
     @marshal_with(VaultSchema(), code='200')
-    @doc(description='Get List of all users vaults, <id> - user prop',
+    @doc(description='Get List of all users vaults, id - user prop',
          params=DOCS_PARAMS_FOR_TOKEN,
          responses=GET_CODES)
     def index(self, id: int, **kwargs):
@@ -28,7 +28,7 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
         return jsonify({'vaults': VaultSchema(many=True).dump(result).data})
 
     @marshal_with(VaultSchema(), code='200')
-    @doc(description='Retrieve one vault, <id> - vault prop',
+    @doc(description='Retrieve one vault, id - vault prop',
          params=DOCS_PARAMS_FOR_TOKEN,
          responses=GET_CODES)
     def get(self, id: int, **kwargs):
@@ -44,7 +44,7 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
     @use_kwargs({'title': fields.Str(),
                  'description': fields.Str()})
     @marshal_with(None)
-    @doc(description='Creates vault, <id> - vault prop',
+    @doc(description='Creates vault, id - vault prop',
          params=DOCS_PARAMS_FOR_TOKEN,
          responses=POST_CODES)
     def post(self, id: int, **kwargs):
@@ -61,7 +61,7 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
     @use_kwargs({'title': fields.Str(),
                 'description': fields.Str()})
     @marshal_with(None)
-    @doc(description='Updates vault, <id> - vault prop',
+    @doc(description='Updates vault, id - vault prop',
          params=DOCS_PARAMS_FOR_TOKEN,
          responses=PATCH_CODES)
     def patch(self, id: int, **kwargs):
@@ -77,7 +77,7 @@ class VaultView(FlaskView, metaclass=ResourceMeta):
             return make_response('Updated', 200)
 
     @marshal_with(None)
-    @doc(description='Delete vault, <id> - vault prop',
+    @doc(description='Delete vault, id - vault prop',
          params=DOCS_PARAMS_FOR_TOKEN,
          responses=DELETE_CODES)
     def delete(self, id: int):

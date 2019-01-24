@@ -27,7 +27,7 @@ class UserView(FlaskView, metaclass=ResourceMeta):
             return jsonify({"users": UserSchema(many=True).dump(result).data})
 
     @marshal_with(schema=UserSchema(), code='200')
-    @doc(description='Retrieve user by id. ',
+    @doc(description='Retrieve user by id. id - user prop.',
          params=DOCS_PARAMS_FOR_TOKEN,
          responses=GET_CODES)
     def get(self, id: int, **kwargs):
@@ -46,7 +46,7 @@ class UserView(FlaskView, metaclass=ResourceMeta):
                  'username': fields.Str(),
                  })
     @marshal_with(None)
-    @doc(description='Updates user. ',
+    @doc(description='Updates user. id - user prop. ',
          params=DOCS_PARAMS_FOR_TOKEN,
          responses=PATCH_CODES)
     def patch(self, id: int, **kwargs):
@@ -62,7 +62,7 @@ class UserView(FlaskView, metaclass=ResourceMeta):
             return make_response('No permission', 403)
 
     @marshal_with(None)
-    @doc(description='Deletes user. ',
+    @doc(description='Deletes user. id - user prop',
          params=DOCS_PARAMS_FOR_TOKEN,
          responses=DELETE_CODES)
     def delete(self, id: int, **kwargs):

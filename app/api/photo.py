@@ -7,11 +7,12 @@ from app.openapi_doc_parameters import *
 from app.api.service import PhotoService
 
 
+@doc(tags=['User'])
 class PhotoView(FlaskView, metaclass=ResourceMeta):
 
-    @doc(description='handle photo update of user',
-         params=DOCS_PARAMS_FOR_PHOTO,
-         consumes='multipart/form-data')
+    @doc(description='Handle photo update of user',
+         consumes=['multipart/form-data'],
+         params=DOCS_PARAMS_FOR_PHOTO)
     def put(self, id: int):
 
         photo = request.files['photo']

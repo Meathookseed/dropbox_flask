@@ -7,7 +7,7 @@ from marshmallow import fields
 from app.api.service import UserService
 
 
-@doc(tags=['Registration'])
+@doc(tags=['Authentication'])
 class RegistrationView(FlaskView, metaclass=ResourceMeta):
 
     @use_kwargs({'username': fields.Str(),
