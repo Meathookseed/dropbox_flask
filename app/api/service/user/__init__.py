@@ -15,10 +15,10 @@ class UserService:
 
     @staticmethod
     @token_required
-    def list(current_user: User, **kwargs) -> Query or None:
+    def list(current_user: User, **kwargs) -> Query or bool:
 
         if not current_user.admin:
-            return None
+            return False
 
         users = User.query.all()
 

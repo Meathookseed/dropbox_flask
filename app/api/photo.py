@@ -10,7 +10,8 @@ from app.api.service import PhotoService
 class PhotoView(FlaskView, metaclass=ResourceMeta):
 
     @doc(description='handle photo update of user',
-         params=DOCS_PARAMS_FOR_PHOTO)
+         params=DOCS_PARAMS_FOR_PHOTO,
+         consumes='multipart/form-data')
     def put(self, id: int):
 
         photo = request.files['photo']

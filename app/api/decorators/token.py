@@ -13,14 +13,14 @@ def token_required(f):
     def decorated(*args, **kwargs):
 
         token = None
-        try:
-            if 'Bearer' in request.headers:
-                token = request.headers['Bearer']
 
-            elif 'token' in kwargs.keys():
-                token = kwargs['token']
+        if 'Bearer' in request.headers:
+            token = request.headers['Bearer']
 
-        except jwt.exceptions.DecodeError:
+        elif 'token' in kwargs.keys():
+            token = kwargs['token']
+
+        if token is None:
             return make_response('Token is invalid', 401)
 
         data = jwt.decode(token, current_app.config['SECRET_KEY'])

@@ -9,7 +9,7 @@ DOCS_PARAMS_FOR_PHOTO = {'Bearer': {"description": "Custom HTTP header which con
                                     "type": "string",
                                     "required": False},
                          'photo': {"description": "Photo upload",
-                                                  "in": "header",
+                                                  "in": "formData",
                                                   "type": "file",
                                                   "required": False}}
 

@@ -21,10 +21,10 @@ class UserView(FlaskView, metaclass=ResourceMeta):
 
         result = UserService.list(**kwargs)
 
-        if result is None:
+        if result is False:
             return make_response('No permission', 403)
-
-        return jsonify({"users": UserSchema(many=True).dump(result).data})
+        else:
+            return jsonify({"users": UserSchema(many=True).dump(result).data})
 
     @marshal_with(schema=UserSchema(), code='200')
     @doc(description='Retrieve user by id. ',
