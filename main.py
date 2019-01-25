@@ -17,6 +17,7 @@ def __handle_vault_events(json: dict):
 @socket.on('file_events')
 def __handle_file_events(json: dict):
     vault = VaultService.one(**json)
+
     emit('file_state', VaultSchema().dump(vault).data)
 
 

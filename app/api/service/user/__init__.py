@@ -123,3 +123,5 @@ class UserService:
         dbsession.commit()
 
         return True
+
+print(UserService.delete.__code__)

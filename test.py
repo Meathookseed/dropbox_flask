@@ -33,7 +33,13 @@ class TestUser(Test):
         data = {'username': 'test', 'password': 'test', "email": "test@test.com", "admin": True}
         UserService.create(data=data)
 
-        response = AuthService.login({'username': 'test', 'password': 'test'})
+        app = TestUser().create_app()
+
+        with app.test_client() as client:
+
+            response = client.post('/login/',
+                                   data=json.dumps({'username': 'test', 'password': 'test'}),
+                                   content_type='application/json')
 
         token = json.loads(response.data)['token']
 
@@ -44,7 +50,12 @@ class TestUser(Test):
         data = {'username': 'test2', 'password': 'test', "email": "test2@test.com", "admin": False}
         UserService.create(data=data)
 
-        response = AuthService.login({'username': 'test2', 'password': 'test'})
+        app = TestUser().create_app()
+
+        with app.test_client() as client:
+            response = client.post('/login/',
+                                   data=json.dumps({'username': 'test2', 'password': 'test'}),
+                                   content_type='application/json')
 
         token = json.loads(response.data)['token']
 
@@ -150,10 +161,15 @@ class TestVault(Test):
 
     @staticmethod
     def create_user():
-        data = {'username': 'test2', 'password': 'tes2t', "email": "test2@test.com", "admin": True}
+        data = {'username': 'test', 'password': 'test', "email": "test2@test.com", "admin": True}
         UserService.create(data=data)
 
-        response = AuthService.login({'username': 'test2', 'password': 'tes2t'})
+        app = TestVault().create_app()
+
+        with app.test_client() as client:
+            response = client.post('/login/',
+                                   data=json.dumps({'username': 'test', 'password': 'test'}),
+                                   content_type='application/json')
 
         token = json.loads(response.data)['token']
 
@@ -162,10 +178,15 @@ class TestVault(Test):
     @staticmethod
     def create_vault():
 
-        data = {'username': 'test', 'password': 'test', "email": "test@create.com", "admin": True}
+        data = {'username': 'test2', 'password': 'test', "email": "test2@create.com", "admin": True}
         UserService.create(data=data)
 
-        response = AuthService.login({'username': 'test', 'password': 'test'})
+        app = TestVault().create_app()
+
+        with app.test_client() as client:
+            response = client.post('/login/',
+                                   data=json.dumps({'username': 'test2', 'password': 'test'}),
+                                   content_type='application/json')
 
         token = json.loads(response.data)['token']
 
@@ -283,7 +304,12 @@ class TestPhoto(Test):
         data = {'username': 'test', 'password': 'test', "email": "test@test.com", "admin": True}
         UserService.create(data=data)
 
-        response = AuthService.login({'username': 'test', 'password': 'test'})
+        app = TestPhoto().create_app()
+
+        with app.test_client() as client:
+            response = client.post('/login/',
+                                   data=json.dumps({'username': 'test', 'password': 'test'}),
+                                   content_type='application/json')
 
         token = json.loads(response.data)['token']
 
@@ -376,7 +402,12 @@ class TestFile(Test):
         data = {'username': 'test', 'password': 'test', "email": "test@test.com", "admin": True}
         UserService.create(data=data)
 
-        response = AuthService.login({'username': 'test', 'password': 'test'})
+        app = TestFile().create_app()
+
+        with app.test_client() as client:
+            response = client.post('/login/',
+                                   data=json.dumps({'username': 'test', 'password': 'test'}),
+                                   content_type='application/json')
 
         token = json.loads(response.data)['token']
 
@@ -399,7 +430,12 @@ class TestFile(Test):
         data = {'username': 'test', 'password': 'test', "email": "test@test2.com", "admin": True}
         UserService.create(data=data)
 
-        response = AuthService.login({'username': 'test', 'password': 'test'})
+        app = TestFile().create_app()
+
+        with app.test_client() as client:
+            response = client.post('/login/',
+                                   data=json.dumps({'username': 'test', 'password': 'test'}),
+                                   content_type='application/json')
 
         token = json.loads(response.data)['token']
 

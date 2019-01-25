@@ -1,3 +1,4 @@
+from flask import make_response, jsonify
 from flask_apispec import ResourceMeta
 from flask_apispec.annotations import doc, use_kwargs, marshal_with
 from flask_classful import FlaskView
@@ -14,4 +15,9 @@ class LoginView(FlaskView, metaclass=ResourceMeta):
     @marshal_with(LoginSchema())
     @doc(descrpiption='Login view')
     def post(self, **kwargs):
-        return AuthService.login(data=kwargs)
+        result = AuthService.login(data=kwargs)
+
+        if result == 'Wrong Data':
+            return make_response('Wrong data!', 401)
+
+        return jsonify({'token': result['token'], 'id': result['id']})
