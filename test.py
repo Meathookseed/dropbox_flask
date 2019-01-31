@@ -5,7 +5,7 @@ import unittest
 from flask_testing import TestCase
 
 from app import create_app
-from app.api.service import AuthService, UserService
+from app.api.service import UserService
 from app.extensions import db
 from app.shortcuts import dbsession
 

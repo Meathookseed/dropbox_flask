@@ -5,3 +5,4 @@ from app.api.photo import PhotoView
 from app.api.registration import RegistrationView
 from app.api.users import UserView
 from app.api.vault import VaultView
+from app.api.charge import ChargeView

@@ -4,10 +4,11 @@ from flask import Flask
 from sqlalchemy_utils import create_database, database_exists
 
 from app.api import (DataView, FileView, LoginView, PhotoView,
-                     RegistrationView, UserView, VaultView)
+                     RegistrationView, UserView, VaultView, ChargeView)
 from app.api.serializers.user import UserSchema
 from app.api.service.file import FileService
 from app.extensions import cors, db, docs, ma, mail, migrate, socket
+
 from from_yaml import YactConfig
 
 
@@ -62,6 +63,8 @@ def create_app(config_file):
     VaultView.register(app, trailing_slash=True)
 
     DataView.register(app, trailing_slash=True)
+
+    ChargeView.register(app, trailing_slash=True)
 
     if not app.config['TESTING']:
         docs.init_app(app)

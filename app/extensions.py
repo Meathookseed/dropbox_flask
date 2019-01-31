@@ -19,3 +19,5 @@ mail = Mail()
 socket = SocketIO()
 
 cors = CORS(send_wildcard=False)
+
+

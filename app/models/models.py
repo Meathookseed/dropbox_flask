@@ -10,6 +10,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     vaults = db.relationship('Vault', cascade='all,delete')
     files = db.relationship('File', cascade='all,delete')
+    stripe = db.relationship('Stripe', cascade='all,delete')
     photo = db.Column(db.String(100))
     admin = db.Column(db.Boolean)
 
@@ -29,3 +30,15 @@ class File(db.Model):
     name = db.Column(db.String(100))
     description = db.Column(db.String())
     data = db.Column(db.String(), unique=True)
+
+
+class Stripe(db.Model):
+
+    def __init__(self, id, stripe_id, token):
+        self.id = id
+        self.stripe_id = stripe_id
+        self.token = token
+
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    stripe_id = db.Column(db.String(150), unique=True, nullable=False,autoincrement=False)
+    token = db.Column(db.String(150), unique=True, nullable=False)
