@@ -1,7 +1,7 @@
-from app.extensions import ma
-from app.models.models import Vault, File
-
 from marshmallow import fields
+
+from app.extensions import ma
+from app.models.models import File, Vault
 
 
 class FileSchema(ma.ModelSchema):
@@ -10,12 +10,9 @@ class FileSchema(ma.ModelSchema):
 
 
 class VaultSchema(ma.ModelSchema):
+
     files = fields.Nested(FileSchema, many=True)
 
     class Meta:
         model = Vault
-        fields = ['title', 'description', 'files', '_links', "owner_id"]
-
-    _links = ma.Hyperlinks({
-        'self': ma.URLFor('VaultView:get', id='<vault_id>'),
-    })
+        fields = ['title', 'description', 'files',"vault_id"]

@@ -1,0 +1,34 @@
+version: '3'
+services:
+  postgres:
+    restart: always
+    image: postgres:9.5
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_DB=flask_dropbox
+    volumes:
+      - ./postgres-data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  app:
+    restart: always
+    build: .
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      FLASK_APP: main.py
+    entrypoint: ["python3","main.py"]
+  redis:
+    image: redis
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A tasks worker --loglevel=info
+    links:
+      - redis

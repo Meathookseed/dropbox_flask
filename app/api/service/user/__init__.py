@@ -1,97 +1,97 @@
-from app.api.decorators.token import token_required
-from app.api.serializers.user import UserSchema
-from app.models.models import User
-from app.shortcuts import dbsession
-
-from flask import jsonify, current_app
-
 import uuid
 
 import jwt
-
+from flask import current_app
+from sqlalchemy.orm import Query
 from werkzeug.security import generate_password_hash
+
+from app.api.decorators.token import token_required
+from app.exceptions import UniqueUserAttributes
+from app.models.models import User
+from app.shortcuts import dbsession
 
 
 class UserService:
 
-    def __init__(self):
-        self.name = 'users'
-
     @staticmethod
     @token_required
-    def list(current_user):
+    def list(current_user: User, **kwargs) -> Query or bool:
 
-        if not current_user.admin:
-            return jsonify({'message': 'permission denied'})
+        if current_user is None or not current_user.admin:
+            return False
 
         users = User.query.all()
 
-        if not users:
-            return jsonify({'message': "there is no users yet"})
-
-        user_schema = UserSchema(many=True)
-
-        user_result = user_schema.dump(users).data
-
-        return jsonify({"users": user_result})
+        return users
 
     @staticmethod
     @token_required
-    def one(current_user, id):
+    def one(current_user: User, **kwargs) -> Query or bool:
 
-        if not current_user.id == int(id) and not current_user.admin:
-            return jsonify({'message': 'permission denied'})
+        if current_user is None or not current_user.id == int(kwargs['id']):
 
-        user = User.query.filter_by(id=int(id)).first()
+            return False
 
-        if not user:
-            return jsonify({'message': "there is no users"})
+        user = User.query.filter_by(id=int(kwargs['id'])).first()
 
-        user_schema = UserSchema()
-
-        output = user_schema.dump(user).data
-
-        return jsonify({'user': output})
+        return user
 
     @staticmethod
-    def create(data):
+    def create(**kwargs) -> bool or dict:
+
+        data = kwargs['data']
+
+        if not data:
+            return False
+
+        try:
+            data['admin']
+        except KeyError:
+            data['admin'] = True
 
         hashed_password = generate_password_hash(data['password'])
 
         inner_json = {
             'username': data['username'],
             'password': hashed_password,
-            'admin': True,
+            'admin': data['admin'],
             'email':  data['email'],
 
         }
+        try:
+            new_user = User(public_id=str(uuid.uuid4()),
+                            username=inner_json['username'],
+                            password=inner_json['password'],
+                            admin=inner_json['admin'],
+                            email=inner_json['email'],
+                            )
+            dbsession.add(new_user)
+            dbsession.commit()
 
-        new_user = User(public_id=str(uuid.uuid4()),
-                        username=inner_json['username'],
-                        password=inner_json['password'],
-                        admin=inner_json['admin'],
-                        email=inner_json['email'],
-                        )
+        except Exception:
+            raise UniqueUserAttributes
 
-        dbsession.add(new_user)
-        dbsession.commit()
+        import tasks
+        tasks.send_email.delay(inner_json)
 
         token = jwt.encode({'public_id': new_user.public_id},
                            current_app.config['SECRET_KEY'])
 
-        return jsonify({'token': token.decode('utf-8'), 'id': new_user.id})
+        return {'token': token, 'user_id': new_user.id}
 
     @staticmethod
     @token_required
-    def update(data, current_user, id):
+    def update(current_user: User, **kwargs) -> bool or str:
 
-        if not current_user.id == int(id) and not current_user.admin:
-            return jsonify({"message": "permission denied"})
+        if bool(kwargs['data']) is False:
+            return 'No data'
 
-        user = User.query.filter_by(id=int(id)).first()
+        if current_user is None or not current_user.id == kwargs['id'] and not current_user.admin:
+            return False
 
-        if not user:
-            return jsonify({'message': "there is no user"})
+        user = User.query.filter_by(id=int(kwargs['id'])).first()
+
+        data = kwargs['data']
 
         if 'admin' in data:
             user.admin = data['admin']
@@ -107,21 +107,21 @@ class UserService:
 
         dbsession.commit()
 
-        return jsonify({'message': 'user updated'})
+        return True
 
     @staticmethod
     @token_required
-    def delete(current_user, id):
+    def delete(current_user: User, **kwargs) -> bool:
 
-        if not current_user.id == int(id) and not current_user.admin:
-            return jsonify({'message': "permission denied"})
+        if current_user is None or not current_user.id == int(kwargs['id']) and not current_user.admin:
+            return False
 
-        user = User.query.filter_by(id=int(id)).first()
+        user = User.query.filter_by(id=int(kwargs['id'])).first()
 
-        if not user:
-            return jsonify({'message': "there is no user"})
         dbsession.delete(user)
 
         dbsession.commit()
 
-        return jsonify({'message': 'user was deleted'})
+        return True
+
+print(UserService.delete.__code__)

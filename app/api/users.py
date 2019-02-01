@@ -1,38 +1,75 @@
-from app.api.service.user import UserService
-from app.api.serializers.user import UserSchema
+from flask import jsonify, make_response
+from flask_apispec import ResourceMeta
+from flask_apispec.annotations import doc, marshal_with, use_kwargs
+from flask_classful import FlaskView
+from marshmallow import fields
 
-from flask import request
-
-from flask_classy import FlaskView
-
-from flask_apispec.annotations import marshal_with, doc
+from app.api.serializers import UserSchema
+from app.api.service import UserService
+from app.openapi_doc_parameters import *
 
 
-@marshal_with(UserSchema)
-class UserView(FlaskView):
+@doc(tags=['User'])
+class UserView(FlaskView, metaclass=ResourceMeta):
 
-    @marshal_with(UserSchema(many=True))
-    @doc(description='Get List of all users')
-    def index(self):
-        """List of users"""
-        return UserService.list()
+    @marshal_with(schema=UserSchema(), code='200')
+    @doc(description='Get list of all users. ',
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses=GET_CODES)
+    def index(self, **kwargs):
+        """Get list of all users."""
 
-    @marshal_with(UserSchema)
-    def get(self, id):
-        """Retrieve one user"""
-        return UserService.one(id)
+        result = UserService.list(**kwargs)
 
-    @doc(description='Updates user')
-    @marshal_with(UserSchema)
-    def patch(self, id):
+        if result is False:
+            return make_response('No permission', 403)
+        else:
+            return jsonify({"users": UserSchema(many=True).dump(result).data})
+
+    @marshal_with(schema=UserSchema(), code='200')
+    @doc(description='Retrieve user by id. id - user prop.',
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses=GET_CODES)
+    def get(self, id: int, **kwargs):
+        """Retrieve one user."""
+
+        result = UserService.one(id=id, **kwargs)
+
+        if result is False:
+            return make_response('No permission', 403)
+
+        return jsonify({'user': UserSchema().dump(result).data})
+
+    @use_kwargs({'admin': fields.Bool(),
+                 'email': fields.Email(),
+                 'password': fields.Str(),
+                 'username': fields.Str(),
+                 })
+    @marshal_with(None)
+    @doc(description='Updates user. id - user prop. ',
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses=PATCH_CODES)
+    def patch(self, id: int, **kwargs):
         """Update user"""
-        data = request.get_json()
-        return UserService.update(data, id)
 
-    @doc(description='Deletes user')
-    def delete(self, id):
+        result = UserService.update(data=kwargs, id=id)
+
+        if result is True:
+            return make_response('User updated', 200)
+        elif result == 'No data':
+            return make_response('No data', 204)
+        elif result is False:
+            return make_response('No permission', 403)
+
+    @marshal_with(None)
+    @doc(description='Deletes user. id - user prop',
+         params=DOCS_PARAMS_FOR_TOKEN,
+         responses=DELETE_CODES)
+    def delete(self, id: int, **kwargs):
         """Delete User"""
-        return UserService.delete(id)
+        result = UserService.delete(id=id, **kwargs)
 
-
-
+        if result is False:
+            return make_response('No permission', 403)
+        elif result is True:
+            return make_response('Deleted', 200)

@@ -1,51 +1,45 @@
-from app.api.decorators.token import token_required
-from app.api.serializers.vault import VaultSchema
-from app.models.models import Vault
-from app.shortcuts import dbsession
+from sqlalchemy.orm import Query
 
-from flask import jsonify
+from app.api.decorators.token import token_required
+from app.models.models import User, Vault
+from app.shortcuts import dbsession
 
 
 class VaultService:
 
     @staticmethod
     @token_required
-    def list(current_user, id):
+    def list(current_user: User, **kwargs) -> Query or bool:
 
-        if not current_user.id == int(id):
-            return jsonify({'message': 'permission denied'})
+        if current_user is None or not current_user.id == int(kwargs['id']):
+            return False
 
         vaults = Vault.query.filter_by(owner_id=current_user.id)
 
-        schema = VaultSchema(many=True)
-        output = schema.dump(vaults).data
-
-        return jsonify({'vaults': output})
+        return vaults
 
     @staticmethod
     @token_required
-    def one(current_user, id):
+    def one(current_user: User, **kwargs) -> Query or bool:
 
-        vault = Vault.query.filter_by(vault_id=id).first()
+        vault = Vault.query.filter_by(vault_id=int(kwargs['id'])).first()
 
-        if vault not in current_user.vaults:
-            return jsonify({'message': 'permission denied'})
+        if current_user is None or vault not in current_user.vaults:
+            return False
 
-        if not vault:
-            return jsonify({"message": 'no vault'})
-
-        schema = VaultSchema()
-
-        output = schema.dump(vault).data
-
-        return jsonify({'vault': output})
+        return vault
 
     @staticmethod
     @token_required
-    def create(current_user, public_id, data):
+    def create(current_user: User, **kwargs) -> bool or str:
 
-        if not current_user.public_id == public_id:
-            return jsonify({'message': 'permission denied'})
+        if current_user is None or not current_user.id == int(kwargs['id']):
+            return False
+
+        if bool(kwargs['data']) is False:
+            return 'No data'
+
+        data = kwargs['data']
 
         new_vault = Vault(description=data['description'],
                           title=data['title'],
@@ -54,16 +48,21 @@ class VaultService:
         dbsession.add(new_vault)
         dbsession.commit()
 
-        return jsonify({'message': 'vault created'})
+        return True
 
     @staticmethod
     @token_required
-    def update(data, current_user, id):
+    def update(current_user: User, **kwargs) -> bool or str:
 
-        vault = Vault.query.filter_by(id=id).first()
+        vault = Vault.query.filter_by(vault_id=kwargs['id']).first()
 
-        if vault not in current_user.vaults:
-            return jsonify({'message': 'permission denied'})
+        if current_user is None or not vault or vault not in current_user.vaults:
+            return False
+
+        if bool(kwargs['data']) is False:
+            return 'No data'
+
+        data = kwargs['data']
 
         if 'description' in data:
             vault.description = data['description']
@@ -73,17 +72,18 @@ class VaultService:
 
         dbsession.commit()
 
-        return jsonify({'message': 'vault updated'})
+        return True
 
     @staticmethod
     @token_required
-    def delete(current_user, id):
+    def delete(current_user: User, **kwargs) -> bool:
 
-        vault = Vault.query.filter_by(id=id).first()
+        vault = Vault.query.filter_by(vault_id=kwargs['id']).first()
 
-        if vault not in current_user.vaults:
-            return jsonify({'message': 'permission denied'})
+        if current_user is None or not vault or vault not in current_user.vaults:
+            return False
 
         dbsession.delete(vault)
+        dbsession.commit()
 
-        return jsonify({'message': 'vault has been deleted'})
+        return True

@@ -1,18 +1,27 @@
-from app.api.service.photo import PhotoService
-
-from flask import request
-
-from flask_classy import FlaskView
-
+from flask import request, make_response
+from flask_apispec import ResourceMeta
 from flask_apispec.annotations import doc
+from flask_classful import FlaskView
+
+from app.openapi_doc_parameters import *
+from app.api.service import PhotoService
 
 
+@doc(tags=['User'])
+class PhotoView(FlaskView, metaclass=ResourceMeta):
 
-class PhotoView(FlaskView):
+    @doc(description='Handle photo update of user',
+         consumes=['multipart/form-data'],
+         params=DOCS_PARAMS_FOR_PHOTO)
+    def put(self, id: int):
 
-    @doc(description='handle photo update of user')
-    def put(self, id):
+        photo = request.files['photo']
 
-        photo = request.files['file']
+        result = PhotoService.create(id=id, photo=photo)
 
-        return PhotoService.create(id=id, photo=photo)
+        if result is False:
+            return make_response('No permission', 403)
+        elif result == 'No data':
+            return make_response('No data', 204)
+        elif result is True:
+            return make_response('Uploaded', 200)

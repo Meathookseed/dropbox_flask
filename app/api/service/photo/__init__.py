@@ -1,39 +1,37 @@
+import os
+
+from flask import current_app
+from werkzeug.utils import secure_filename
+
 from app.api.decorators.token import token_required
 from app.models.models import User
 from app.shortcuts import dbsession
-
-from flask import jsonify, current_app
-
-import os
-
-from werkzeug.utils import secure_filename
 
 
 class PhotoService:
 
     @staticmethod
     @token_required
-    def create(current_user, photo, id):
+    def create(current_user: User, **kwargs) -> bool or str:
 
-        try:
+        if current_user is None or not current_user.id == kwargs['id']:
+            return False
 
-            if not current_user.id == id:
-                return jsonify({"message": "permission denied"})
+        if bool(kwargs['photo']) is False:
+            return 'No data'
 
-        except AttributeError:
-
-            return jsonify({'error': 'not logged in'})
+        photo = kwargs['photo']
 
         filename = secure_filename(photo.filename)
 
         file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
 
-        photo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        photo.save(file_folder)
 
-        user = User.query.filter_by(id=id).first()
+        user = User.query.filter_by(id=kwargs['id']).first()
 
         user.photo = file_folder
 
         dbsession.commit()
 
-        return jsonify({'message': 'photo uploaded'})
+        return True
