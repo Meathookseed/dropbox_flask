@@ -14,7 +14,7 @@ connexion==2.0.2
 coverage==4.5.2
 cryptography==2.4.2
 dnspython==1.16.0
-eventlet==0.24.1
+eventlet==0.31.0
 Flask==1.0.2
 flask-apispec==0.7.0
 Flask-Classful==0.14.1
